@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 export const unstable_settings = {
@@ -13,6 +14,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     Manrope: require('@/assets/fonts/Manrope-VariableFont_wght.ttf'),
+    NewsReader: require('@/assets/fonts/Newsreader-VariableFont_opsz,wght.ttf'),
   });
 
   useEffect(() => {
@@ -28,9 +30,11 @@ export default function RootLayout() {
     return null;
   }
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }}></Stack>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='index' />
+      </Stack>
       <StatusBar style='auto' />
-    </>
+    </SafeAreaView>
   );
 }
