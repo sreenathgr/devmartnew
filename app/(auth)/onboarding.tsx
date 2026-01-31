@@ -1,4 +1,5 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -51,7 +52,8 @@ const Onboarding = () => {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.onboardingBackground }}>
       <Pressable
-        onPress={() => {
+        onPress={async () => {
+          await AsyncStorage.setItem('isFirstTime', 'false');
           router.replace('/(auth)/login');
         }}
         style={({ pressed }) => [
@@ -136,10 +138,11 @@ const Onboarding = () => {
         </View>
         <View style={{ position: 'absolute', bottom: 0, left: 20, right: 20 }}>
           <Pressable
-            onPress={() => {
+            onPress={async () => {
               if (currentPage < 2) {
                 pagerRef?.current?.setPage(currentPage + 1);
               } else {
+                await AsyncStorage.setItem('isFirstTime', 'false');
                 console.log('navigate to login');
                 router.replace('/(auth)/login');
               }
