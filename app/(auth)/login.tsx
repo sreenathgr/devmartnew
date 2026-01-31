@@ -54,6 +54,9 @@ const Login = () => {
           </View>
           <View style={styles.loginButtonView}>
             <Pressable
+              onPress={() => {
+                router.replace('/(postAuth)/(tabs)');
+              }}
               style={({ pressed }) => [
                 {
                   opacity: pressed ? 0.5 : 1,
