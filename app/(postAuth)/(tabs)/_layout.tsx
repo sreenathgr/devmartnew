@@ -9,7 +9,7 @@ const TabLayout = () => {
   const TabGradient = () => {
     return (
       <LinearGradient
-        colors={['#1e1b4b', '#0B0E14']} // Your theme colors
+        colors={['#1e1b4b', '#0B0E14']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -31,7 +31,7 @@ const TabLayout = () => {
       }}
     >
       <Tabs.Screen
-        name='index'
+        name='home'
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
