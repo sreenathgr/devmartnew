@@ -7,8 +7,11 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeDrawerButton from '../HomeDrawerButton/HomeDrawerButton';
 const HomeDrawerContent = (props: DrawerContentComponentProps) => {
+  const insets = useSafeAreaInsets();
+
   return (
     <LinearGradient
       colors={['#1e1b4b', '#0B0E14']}
@@ -24,7 +27,9 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
         }}
       >
         <View>
-          <View style={{ paddingTop: rw(3), paddingHorizontal: rw(6) }}>
+          <View
+            style={{ paddingTop: insets.top + rw(2), paddingHorizontal: rw(6) }}
+          >
             <View
               style={{
                 borderColor: Colors.acccentBlue,
@@ -115,7 +120,7 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
           >
             <HomeDrawerButton
               iconName='settings'
-              titleText='Wallet'
+              titleText='Settings'
               iconColour='yellow'
               topPadding={rh(2)}
               IconComponent={Ionicons}
@@ -147,7 +152,7 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
           <View style={{ paddingHorizontal: rw(5) }}>
             <HomeDrawerButton
               iconName='logout'
-              titleText='Help & Support'
+              titleText='Logout'
               iconColour='red'
               topPadding={rh(2)}
               IconComponent={MaterialIcons}

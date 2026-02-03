@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/Colors';
+import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -16,9 +17,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Register = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [toggleVisiblePassword, setToggleVisiblePassword] =
     useState<boolean>(false);
   return (
@@ -38,8 +41,8 @@ const Register = () => {
             end={{ x: 1, y: 1 }}
             style={{ flex: 1, paddingBottom: 50 }}
           >
-            <View style={{ paddingHorizontal: '8%' }}>
-              <View style={{ paddingTop: '15%' }}>
+            <View style={{ paddingHorizontal: rw(7) }}>
+              <View style={{ paddingTop: insets.top }}>
                 <Text
                   style={{
                     color: 'white',
@@ -50,19 +53,19 @@ const Register = () => {
                   Create Account
                 </Text>
               </View>
-              <View style={{ paddingTop: '2%' }}>
+              <View style={{ paddingTop: rh(1) }}>
                 <Text style={{ color: '#7B8691', fontSize: 18 }}>
                   Join our exclusive community
                 </Text>
               </View>
-              <View style={{ paddingTop: '15%' }}>
+              <View style={{ paddingTop: rh(3) }}>
                 <Text
                   style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
                 >
                   FULL NAME
                 </Text>
               </View>
-              <View style={{ paddingTop: '5%' }}>
+              <View style={{ paddingTop: rh(2) }}>
                 <TextInput
                   style={{
                     color: 'white',
@@ -71,7 +74,7 @@ const Register = () => {
                     height: 70,
                     borderColor: Colors.acccentBlue,
                     backgroundColor: '#21262E',
-                    paddingStart: '13%',
+                    paddingStart: rw(11),
                     borderRadius: 20,
                   }}
                   placeholder='John Doe'
@@ -87,14 +90,14 @@ const Register = () => {
                   />
                 </View>
               </View>
-              <View style={{ paddingTop: '7%' }}>
+              <View style={{ paddingTop: rh(3) }}>
                 <Text
                   style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
                 >
                   EMAIL ADDRESS
                 </Text>
               </View>
-              <View style={{ paddingTop: '5%' }}>
+              <View style={{ paddingTop: rh(2) }}>
                 <TextInput
                   style={{
                     color: 'white',
@@ -103,7 +106,7 @@ const Register = () => {
                     height: 70,
                     borderColor: Colors.acccentBlue,
                     backgroundColor: '#21262E',
-                    paddingStart: '13%',
+                    paddingStart: rw(11),
                     borderRadius: 20,
                   }}
                   placeholder='hello@aesthetic.com'
@@ -119,14 +122,14 @@ const Register = () => {
                   />
                 </View>
               </View>
-              <View style={{ paddingTop: '7%' }}>
+              <View style={{ paddingTop: rh(3) }}>
                 <Text
                   style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
                 >
                   PASSWORD
                 </Text>
               </View>
-              <View style={{ paddingTop: '5%' }}>
+              <View style={{ paddingTop: rh(3) }}>
                 <TextInput
                   maxLength={20}
                   style={{
@@ -136,7 +139,7 @@ const Register = () => {
                     height: 70,
                     borderColor: Colors.acccentBlue,
                     backgroundColor: '#21262E',
-                    paddingStart: '13%',
+                    paddingStart: rw(11),
                     borderRadius: 20,
                   }}
                   secureTextEntry={toggleVisiblePassword}
@@ -172,14 +175,14 @@ const Register = () => {
                   />
                 </Pressable>
               </View>
-              <View style={{ paddingTop: '7%' }}>
+              <View style={{ paddingTop: rh(3) }}>
                 <Text
                   style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
                 >
                   CONFIRM PASSWORD
                 </Text>
               </View>
-              <View style={{ paddingTop: '5%' }}>
+              <View style={{ paddingTop: rh(2) }}>
                 <TextInput
                   maxLength={20}
                   style={{
@@ -189,7 +192,7 @@ const Register = () => {
                     height: 70,
                     borderColor: Colors.acccentBlue,
                     backgroundColor: '#21262E',
-                    paddingStart: '13%',
+                    paddingStart: rw(11),
                     borderRadius: 20,
                   }}
                   placeholder='Renter password'
@@ -205,7 +208,7 @@ const Register = () => {
                   />
                 </View>
               </View>
-              <View style={{ paddingTop: '10%' }}>
+              <View style={{ paddingTop: rh(5) }}>
                 <Pressable
                   style={({ pressed }) => [
                     {
@@ -234,7 +237,7 @@ const Register = () => {
                       Create Account
                     </Text>
                   </View>
-                  <View style={{ paddingStart: '5%' }}>
+                  <View style={{ paddingStart: rw(3) }}>
                     <MaterialIcons
                       name='arrow-forward'
                       size={28}
@@ -251,7 +254,7 @@ const Register = () => {
                   {
                     opacity: pressed ? 0.5 : 1,
                     alignItems: 'center',
-                    paddingTop: '7%',
+                    paddingTop: rh(3),
                   },
                 ]}
               >

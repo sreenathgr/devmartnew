@@ -15,10 +15,13 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import { Colors } from '../../constants/Colors';
 
 const Onboarding = () => {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -59,8 +62,8 @@ const Onboarding = () => {
         style={({ pressed }) => [
           {
             opacity: pressed ? 0.5 : 1,
-            paddingTop: '10%',
-            paddingEnd: '10%',
+            paddingTop: insets.top,
+            paddingEnd: rw(8),
             alignSelf: 'flex-end',
           },
         ]}
@@ -75,7 +78,7 @@ const Onboarding = () => {
           SKIP
         </Text>
       </Pressable>
-      <View style={{ paddingTop: '10%' }}>
+      <View style={{ paddingTop: rh(5) }}>
         <PagerView
           style={{ width: '100%', height: '80%' }}
           initialPage={0}
@@ -118,7 +121,7 @@ const Onboarding = () => {
                   height: 6,
                   borderRadius: 60,
 
-                  marginStart: '8%',
+                  marginStart: rw(2),
                 },
                 style2,
               ]}
@@ -129,7 +132,7 @@ const Onboarding = () => {
                   height: 6,
                   borderRadius: 60,
 
-                  marginStart: '8%',
+                  marginStart: rw(2),
                 },
                 style3,
               ]}
@@ -155,7 +158,7 @@ const Onboarding = () => {
                 justifyContent: 'center',
                 borderRadius: 15,
                 backgroundColor: Colors.onboardingButton,
-                padding: 15,
+                padding: rw(4),
               },
             ]}
           >
@@ -164,7 +167,7 @@ const Onboarding = () => {
             >
               {currentPage < 2 ? 'Next' : 'Get Started'}
             </Text>
-            <View style={{ paddingStart: 10, alignSelf: 'flex-end' }}>
+            <View style={{ paddingStart: rw(3), alignSelf: 'flex-end' }}>
               <AntDesign
                 name='arrow-right'
                 size={17}

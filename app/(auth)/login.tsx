@@ -1,14 +1,19 @@
 import { Colors } from '@/constants/Colors';
+import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const Login = () => {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [isPasswordVisible, setPasswordVisible] = useState<boolean>(false);
   return (
     <View style={styles.container}>
-      <View style={styles.outerDivContainer}>
+      <View
+        style={[styles.outerDivContainer, { marginTop: insets.top - rw(3) }]}
+      >
         <View style={styles.welcomeBackTextView}>
           <Text style={styles.welcomeBackText}>Welcome Back</Text>
         </View>
@@ -68,6 +73,9 @@ const Login = () => {
             </Pressable>
           </View>
           <Pressable
+            onPress={() => {
+              router.push('/(auth)/forgotPwd');
+            }}
             style={({ pressed }) => [
               {
                 opacity: pressed ? 0.5 : 1,
@@ -106,12 +114,12 @@ const styles = StyleSheet.create({
   newHereText: { color: '#7B8691', fontSize: 18 },
   createAccountButton: {
     alignItems: 'center',
-    paddingTop: '10%',
+    paddingTop: rh(5),
   },
   forgotPasswordText: { color: '#7B8691' },
   forgotPasswordTextView: {
     alignItems: 'center',
-    paddingTop: '10%',
+    paddingTop: rh(2),
   },
   loginButtonTextStyle: {
     fontSize: 15,
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 20,
   },
-  loginButtonView: { paddingHorizontal: '10%', paddingTop: '10%' },
+  loginButtonView: { paddingHorizontal: rw(7), paddingTop: rh(3) },
   eyeIconAbsoluteView: { position: 'absolute', left: '95%', bottom: '25%' },
   passwordTextInputStyle: {
     height: 50,
@@ -137,9 +145,9 @@ const styles = StyleSheet.create({
     color: '#7B8691',
     fontSize: 15,
   },
-  passwordTextInputView: { paddingHorizontal: '10%', paddingTop: '5%' },
+  passwordTextInputView: { paddingHorizontal: rw(7), paddingTop: rh(2) },
   passwordText: { color: 'white', fontFamily: 'Manrope' },
-  passwordTextView: { paddingTop: '10%', paddingStart: '10%' },
+  passwordTextView: { paddingTop: rh(3), paddingStart: rw(7) },
   emailAddressTextInputStyle: {
     height: 50,
     backgroundColor: '#21262E',
@@ -149,33 +157,33 @@ const styles = StyleSheet.create({
     color: '#7B8691',
     fontSize: 15,
   },
-  emailAddressTextInputView: { paddingHorizontal: '10%', paddingTop: '5%' },
+  emailAddressTextInputView: { paddingHorizontal: rw(7), paddingTop: rh(2) },
   emailAddressText: { color: 'white', fontFamily: 'Manrope' },
-  emailAddressView: { paddingTop: '10%', paddingStart: '10%' },
+  emailAddressView: { paddingTop: rh(5), paddingStart: rw(7) },
   innerDivContainer: {
     backgroundColor: '#FFFFFF1A',
     borderColor: Colors.acccentBlue,
     borderWidth: 0.5,
-    marginTop: '10%',
-    marginHorizontal: '8%',
-    paddingBottom: '5%',
+    marginTop: rh(5),
+    marginHorizontal: rw(10),
+    paddingBottom: rh(2),
     borderRadius: 20,
     shadowColor: Colors.loginBackground,
     shadowRadius: 30,
     shadowOffset: { width: 20, height: 20 },
   },
   enterDetailsText: { color: 'white', fontFamily: 'Manrope', fontSize: 15 },
-  enterDetailsTextView: { paddingTop: '3%', alignItems: 'center' },
+  enterDetailsTextView: { paddingTop: rh(2), alignItems: 'center' },
   welcomeBackText: { color: 'white', fontFamily: 'Manrope', fontSize: 30 },
-  welcomeBackTextView: { paddingTop: '30%', alignItems: 'center' },
+  welcomeBackTextView: { paddingTop: rh(12), alignItems: 'center' },
   outerDivContainer: {
     backgroundColor: Colors.loginBackgroundSecondary,
     borderColor: Colors.acccentBlue,
     borderWidth: 0.5,
-    marginTop: '5%',
+
     marginHorizontal: 20,
     borderRadius: 20,
-    paddingBottom: '30%',
+    paddingBottom: rh(14),
   },
   container: { flex: 1, backgroundColor: Colors.loginBackground },
 });
