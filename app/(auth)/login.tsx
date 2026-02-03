@@ -1,108 +1,181 @@
 import { Colors } from '@/constants/Colors';
+import { emailRegex } from '@/utils/regex';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const Login = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [isPasswordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState<string>('');
+
+  const validateSubmit = () => {
+    let is_validated = true;
+    setEmailError(false);
+    setEmailErrorMessage('');
+    setPasswordError(false);
+    setPasswordErrorMessage('');
+
+    if (email.trim().length === 0) {
+      setEmailError(true);
+      setEmailErrorMessage('Enter an email');
+      is_validated = false;
+    } else if (!emailRegex.test(email.trim())) {
+      setEmailError(true);
+      setEmailErrorMessage('Enter a valid email');
+      is_validated = false;
+    }
+
+    if (password.trim().length === 0) {
+      setPasswordError(true);
+      setPasswordErrorMessage('Enter a password');
+      is_validated = false;
+    }
+    if (password.trim().length < 8) {
+      setPasswordError(true);
+      setPasswordErrorMessage('Minimum password length is 8');
+      is_validated = false;
+    }
+    return is_validated;
+  };
   return (
     <View style={styles.container}>
-      <View
-        style={[styles.outerDivContainer, { marginTop: insets.top - rw(3) }]}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
       >
-        <View style={styles.welcomeBackTextView}>
-          <Text style={styles.welcomeBackText}>Welcome Back</Text>
-        </View>
-        <View style={styles.enterDetailsTextView}>
-          <Text style={styles.enterDetailsText}>
-            Enter your details to access your account
-          </Text>
-        </View>
-        <View style={styles.innerDivContainer}>
-          <View style={styles.emailAddressView}>
-            <Text style={styles.emailAddressText}>EMAIL ADDRESS</Text>
+        <View
+          style={[styles.outerDivContainer, { marginTop: insets.top - rw(3) }]}
+        >
+          <View style={styles.welcomeBackTextView}>
+            <Text style={styles.welcomeBackText}>Welcome Back</Text>
           </View>
-          <View style={styles.emailAddressTextInputView}>
-            <TextInput style={styles.emailAddressTextInputStyle} />
+          <View style={styles.enterDetailsTextView}>
+            <Text style={styles.enterDetailsText}>
+              Enter your details to access your account
+            </Text>
           </View>
-          <View style={styles.passwordTextView}>
-            <Text style={styles.passwordText}>PASSWORD</Text>
-          </View>
-          <View style={styles.passwordTextInputView}>
-            <TextInput
-              maxLength={20}
-              style={styles.passwordTextInputStyle}
-              secureTextEntry={isPasswordVisible}
-            />
-            <View style={styles.eyeIconAbsoluteView}>
+          <View style={styles.innerDivContainer}>
+            <View style={styles.emailAddressView}>
+              <Text style={styles.emailAddressText}>EMAIL ADDRESS</Text>
+            </View>
+            <View style={styles.emailAddressTextInputView}>
+              <TextInput
+                style={[
+                  styles.emailAddressTextInputStyle,
+                  { borderColor: emailError ? 'red' : Colors.acccentBlue },
+                ]}
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+              />
+            </View>
+            {emailError && (
+              <View style={{ alignItems: 'center', paddingTop: rh(1) }}>
+                <Text style={{ color: 'red' }}>{emailErrorMessage}</Text>
+              </View>
+            )}
+            <View style={styles.passwordTextView}>
+              <Text style={styles.passwordText}>PASSWORD</Text>
+            </View>
+            <View style={styles.passwordTextInputView}>
+              <TextInput
+                style={[
+                  styles.passwordTextInputStyle,
+                  { borderColor: passwordError ? 'red' : Colors.acccentBlue },
+                ]}
+                secureTextEntry={isPasswordVisible}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <View style={styles.eyeIconAbsoluteView}>
+                <Pressable
+                  style={({ pressed }) => [
+                    {
+                      opacity: pressed ? 0.5 : 1,
+                    },
+                  ]}
+                  onPress={() => {
+                    setPasswordVisible((prev) => !prev);
+                  }}
+                >
+                  <AntDesign
+                    name='eye'
+                    size={24}
+                    color='#7B8691'
+                  />
+                </Pressable>
+              </View>
+            </View>
+            {passwordError && (
+              <View style={{ alignItems: 'center', paddingTop: rh(1) }}>
+                <Text style={{ color: 'red' }}>{passwordErrorMessage}</Text>
+              </View>
+            )}
+            <View style={styles.loginButtonView}>
               <Pressable
+                onPress={() => {
+                  if (validateSubmit()) {
+                    router.replace('/(postAuth)/(tabs)/home');
+                  }
+                }}
                 style={({ pressed }) => [
                   {
                     opacity: pressed ? 0.5 : 1,
                   },
+                  styles.loginButtonStyle,
                 ]}
-                onPress={() => {
-                  setPasswordVisible((prev) => !prev);
-                }}
               >
-                <AntDesign
-                  name='eye'
-                  size={24}
-                  color='#7B8691'
-                />
+                <Text style={styles.loginButtonTextStyle}>Log In</Text>
               </Pressable>
             </View>
-          </View>
-          <View style={styles.loginButtonView}>
             <Pressable
               onPress={() => {
-                router.replace('/(postAuth)/(tabs)/home');
+                router.push('/(auth)/forgotPwd');
               }}
               style={({ pressed }) => [
                 {
                   opacity: pressed ? 0.5 : 1,
                 },
-                styles.loginButtonStyle,
+                styles.forgotPasswordTextView,
               ]}
             >
-              <Text style={styles.loginButtonTextStyle}>Log In</Text>
+              <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
             </Pressable>
           </View>
           <Pressable
             onPress={() => {
-              router.push('/(auth)/forgotPwd');
+              router.replace('/(auth)/register');
             }}
             style={({ pressed }) => [
               {
                 opacity: pressed ? 0.5 : 1,
               },
-              styles.forgotPasswordTextView,
+              styles.createAccountButton,
             ]}
           >
-            <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
+            <Text style={styles.newHereText}>
+              New here?{' '}
+              <Text style={styles.createAccountText}> Create Account</Text>
+            </Text>
           </Pressable>
         </View>
-        <Pressable
-          onPress={() => {
-            router.replace('/(auth)/register');
-          }}
-          style={({ pressed }) => [
-            {
-              opacity: pressed ? 0.5 : 1,
-            },
-            styles.createAccountButton,
-          ]}
-        >
-          <Text style={styles.newHereText}>
-            New here?{' '}
-            <Text style={styles.createAccountText}> Create Account</Text>
-          </Text>
-        </Pressable>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -140,7 +213,7 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: '#21262E',
     borderRadius: 20,
-    borderColor: Colors.acccentBlue,
+    paddingEnd: rw(10),
     borderWidth: 0.5,
     color: '#7B8691',
     fontSize: 15,
@@ -152,7 +225,7 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: '#21262E',
     borderRadius: 20,
-    borderColor: Colors.acccentBlue,
+
     borderWidth: 0.5,
     color: '#7B8691',
     fontSize: 15,
