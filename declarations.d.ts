@@ -4,3 +4,8 @@ declare module '*.svg' {
   const content: React.FC<SvgProps>;
   export default content;
 }
+declare module 'firebase/auth/react-native' {
+  import { Persistence } from 'firebase/auth';
+  export * from 'firebase/auth';
+  export const getReactNativePersistence: (storage: any) => Persistence;
+}

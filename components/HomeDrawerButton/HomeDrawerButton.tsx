@@ -17,7 +17,7 @@ type HomeDrawerButtonProps = {
   titleText: string;
   titleTextColor?: string;
   topPadding?: DimensionValue;
-  onDrawerButtonPress?: () => {};
+  onDrawerButtonPress?: () => void;
 };
 
 const HomeDrawerButton = ({

@@ -5,7 +5,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 SplashScreen.preventAutoHideAsync();
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -29,6 +28,7 @@ export default function RootLayout() {
   if (!loaded && !error) {
     return null;
   }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>

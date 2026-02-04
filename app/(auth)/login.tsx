@@ -1,9 +1,11 @@
+import { auth } from '@/config/firebase/firebaseConfig';
 import { Colors } from '@/constants/Colors';
 import { emailRegex } from '@/utils/regex';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +16,8 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-const Login = () => {
+
+const Login = (props: any) => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [email, setEmail] = useState<string>('');
@@ -24,6 +27,8 @@ const Login = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
   const [passwordError, setPasswordError] = useState<boolean>(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string>('');
+  const [loginError, setLoginError] = useState<boolean>(false);
+  const [loginErrorMessage, setLoginErrorMessage] = useState<string>('');
 
   const validateSubmit = () => {
     let is_validated = true;
@@ -54,6 +59,39 @@ const Login = () => {
     }
     return is_validated;
   };
+  const classifyLoginError = (error: any) => {
+    if (error === 'Firebase: Error (auth/invalid-credential).') {
+      setLoginError(true);
+      setLoginErrorMessage('Invalid username or password');
+    } else {
+      setLoginError(true);
+      setLoginErrorMessage(error);
+    }
+  };
+  const handleLogin = async () => {
+    setLoginError(false);
+    setLoginErrorMessage('');
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      console.log('logged in', user.email);
+    } catch (error: any) {
+      classifyLoginError(error.message);
+    }
+  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.replace('/(postAuth)/(tabs)/home');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -99,7 +137,7 @@ const Login = () => {
                   styles.passwordTextInputStyle,
                   { borderColor: passwordError ? 'red' : Colors.acccentBlue },
                 ]}
-                secureTextEntry={isPasswordVisible}
+                secureTextEntry={!isPasswordVisible}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
@@ -131,7 +169,7 @@ const Login = () => {
               <Pressable
                 onPress={() => {
                   if (validateSubmit()) {
-                    router.replace('/(postAuth)/(tabs)/home');
+                    handleLogin();
                   }
                 }}
                 style={({ pressed }) => [
@@ -144,6 +182,13 @@ const Login = () => {
                 <Text style={styles.loginButtonTextStyle}>Log In</Text>
               </Pressable>
             </View>
+            {loginError && (
+              <View style={{ alignItems: 'center', paddingTop: rh(2) }}>
+                <Text style={{ color: 'red', fontSize: 15 }}>
+                  {loginErrorMessage}
+                </Text>
+              </View>
+            )}
             <Pressable
               onPress={() => {
                 router.push('/(auth)/forgotPwd');
@@ -214,6 +259,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#21262E',
     borderRadius: 20,
     paddingEnd: rw(10),
+    paddingStart: rw(3),
     borderWidth: 0.5,
     color: '#7B8691',
     fontSize: 15,
@@ -225,7 +271,7 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: '#21262E',
     borderRadius: 20,
-
+    paddingStart: rw(3),
     borderWidth: 0.5,
     color: '#7B8691',
     fontSize: 15,
