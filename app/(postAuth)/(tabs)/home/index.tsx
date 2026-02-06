@@ -1,3 +1,4 @@
+import HomeFilterButton from '@/components/HomeFilterButton/HomeFilterButton';
 import { Colors } from '@/constants/Colors';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
@@ -9,6 +10,7 @@ import { Timestamp } from 'firebase/firestore';
 import React from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -25,6 +27,13 @@ type UserData = {
   email: string;
   createdAt: Timestamp;
 };
+
+type ProductProps = {
+  productImg: string;
+  productName: string;
+  price: string;
+};
+
 const Home = () => {
   const insets = useSafeAreaInsets();
   const {
@@ -32,6 +41,41 @@ const Home = () => {
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
+
+  const dummyData = [
+    {
+      id: '0',
+      productImg: 'url/0',
+      productName: 'Nike Shoes',
+      price: '200',
+    },
+
+    {
+      id: '1',
+      productImg: 'url/1',
+      productName: 'Headset',
+      price: '300',
+    },
+  ];
+  const ProductRenderItem = ({ item }: { item: ProductProps }) => {
+    return (
+      <View>
+        <View>
+          <Image
+            source={require('@/assets/images/dummyprofile.png')}
+            style={{ width: 50, height: 50 }}
+            resizeMode='contain'
+          />
+        </View>
+        <View>
+          <Text style={{ color: 'white' }}>{item.productName}</Text>
+        </View>
+        <View>
+          <Text style={{ color: 'lightblue' }}>{item.price}</Text>
+        </View>
+      </View>
+    );
+  };
   return (
     <LinearGradient
       colors={['#1e1b4b', '#0B0E14']}
@@ -150,29 +194,58 @@ const Home = () => {
                   />
                 </View>
               </View>
-              <ScrollView
-                horizontal
+              <View style={{ paddingTop: rh(3) }}>
+                <ScrollView
+                  horizontal
+                  style={{
+                    width: '100%',
+                  }}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingBottom: rh(2),
+                  }}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  <HomeFilterButton label='All' />
+                  <HomeFilterButton
+                    marginStartFilterButton={rw(3)}
+                    label={'Shoes'}
+                  />
+                  <HomeFilterButton
+                    marginStartFilterButton={rw(3)}
+                    label={'Apparel'}
+                  />
+                  <HomeFilterButton
+                    marginStartFilterButton={rw(3)}
+                    label={'Accessories'}
+                  />
+                </ScrollView>
+              </View>
+              <View
                 style={{
-                  width: '100%',
-                  height: 90,
-                  paddingTop: rh(5),
+                  paddingTop: rh(3),
+                  flexDirection: 'row',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
                 }}
               >
-                <View
-                  style={{
-                    paddingHorizontal: rw(8),
-                    paddingVertical: rh(1),
-                    borderColor: Colors.acccentBlue,
-                    backgroundColor: '#21262E',
-                    borderWidth: 1,
-                    borderRadius: 20,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ color: 'white' }}>All</Text>
+                <View>
+                  <Text style={{ color: 'white', fontSize: 20 }}>
+                    Curated for you
+                  </Text>
                 </View>
-              </ScrollView>
+                <View>
+                  <Text style={{ color: 'lightblue', fontSize: 16 }}>
+                    View all
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <FlatList
+                  data={dummyData}
+                  renderItem={({ item }) => <ProductRenderItem item={item} />}
+                />
+              </View>
             </View>
           </View>
         )}
