@@ -1,5 +1,6 @@
 import { auth } from '@/config/firebase/firebaseConfig';
 import { Colors } from '@/constants/Colors';
+import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -9,13 +10,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect } from 'react';
-
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeDrawerButton from '../HomeDrawerButton/HomeDrawerButton';
 const HomeDrawerContent = (props: DrawerContentComponentProps) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { userData, userDataLoading } = useGetCurrentUserData();
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -36,6 +37,25 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
 
     return () => unsubscribe(); // Cleanup on unmount
   }, []);
+
+  if (userDataLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: '#1e1b4b',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ActivityIndicator
+          size='large'
+          color={Colors.acccentBlue}
+        />
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#1e1b4b', '#0B0E14']}
@@ -58,24 +78,36 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
               style={{
                 borderColor: Colors.acccentBlue,
                 borderWidth: 1,
-                width: 80,
-                height: 80,
+                width: 70,
+                height: 70,
                 borderRadius: 10,
+
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
               }}
             >
-              <View style={{ padding: rw(3), borderRadius: 10 }}>
+              {userData?.profileUrl ? (
+                <Image
+                  source={{ uri: userData?.profileUrl }}
+                  resizeMode='contain'
+                  style={{ width: 60, height: 60, borderRadius: 10 }}
+                />
+              ) : (
                 <Image
                   source={require('@/assets/images/dummyprofile.png')}
-                  resizeMode='center'
-                  style={{ width: '100%', height: '100%' }}
+                  resizeMode='contain'
+                  style={{ width: 30, height: 30 }}
                 />
-              </View>
+              )}
             </View>
             <View style={{ paddingTop: '7%' }}>
-              <Text style={{ color: 'white', fontSize: 20 }}>Alex Rivera</Text>
+              <Text style={{ color: 'white', fontSize: 20 }}>
+                {userData.fullName}
+              </Text>
             </View>
             <View>
-              <Text style={{ color: '#7B8691' }}>alex.rivera@premium.com</Text>
+              <Text style={{ color: '#7B8691' }}>{userData.email}</Text>
             </View>
           </View>
           <View style={{ paddingTop: rw(7) }}>
