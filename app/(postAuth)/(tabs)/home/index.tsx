@@ -26,9 +26,11 @@ type UserData = {
   fullName: string;
   email: string;
   createdAt: Timestamp;
+  curatedItems: ProductProps[];
 };
 
 type ProductProps = {
+  id: string;
   productImg: string;
   productName: string;
   price: string;
@@ -42,218 +44,231 @@ const Home = () => {
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
 
-  const dummyData = [
+  const dummyData: ProductProps[] = [
+    { id: '0', productImg: 'url/0', productName: 'Nike Shoes', price: '200' },
+    { id: '1', productImg: 'url/1', productName: 'Headset', price: '300' },
+    { id: '2', productImg: 'url/2', productName: 'Handbag', price: '150' },
+    { id: '3', productImg: 'url/3', productName: 'Laptop stand', price: '450' },
     {
-      id: '0',
-      productImg: 'url/0',
-      productName: 'Nike Shoes',
-      price: '200',
-    },
-
-    {
-      id: '1',
-      productImg: 'url/1',
-      productName: 'Headset',
-      price: '300',
+      id: '4',
+      productImg: 'url/4',
+      productName: 'Samsung galaxy 50 pro',
+      price: '500',
     },
   ];
-  const ProductRenderItem = ({ item }: { item: ProductProps }) => {
-    return (
+
+  // 1. Render Item for Products
+  const ProductRenderItem = ({ item }: { item: ProductProps }) => (
+    <View
+      style={{
+        backgroundColor: '#21262E',
+        maxWidth: '48%',
+        flex: 1,
+        paddingVertical: rh(3),
+        alignItems: 'center',
+        borderRadius: 20,
+        marginBottom: rh(2),
+      }}
+    >
       <View>
-        <View>
-          <Image
-            source={require('@/assets/images/dummyprofile.png')}
-            style={{ width: 50, height: 50 }}
-            resizeMode='contain'
+        <Image
+          source={{ uri: item.productImg }}
+          style={{ width: 150, height: 150, borderRadius: 20 }}
+          resizeMode='cover'
+        />
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: '#21262E',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: rw(2),
+            borderRadius: 10,
+            right: 5,
+            top: 5,
+          }}
+        >
+          <FontAwesome
+            name='heart'
+            size={15}
+            color='white'
           />
         </View>
-        <View>
-          <Text style={{ color: 'white' }}>{item.productName}</Text>
+      </View>
+      <Text style={{ color: 'white', marginTop: rh(1), fontWeight: '600' }}>
+        {item.productName}
+      </Text>
+      <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
+    </View>
+  );
+
+  const FlatListHeader = () => (
+    <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Image
+            source={{ uri: userData?.profileUrl }}
+            style={{
+              width: 45,
+              height: 45,
+              borderRadius: 22.5,
+              backgroundColor: '#333',
+            }}
+          />
+          <View style={{ paddingStart: rw(4), flex: 1 }}>
+            <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+              {userData?.fullName || 'Guest'}
+            </Text>
+          </View>
         </View>
-        <View>
-          <Text style={{ color: 'lightblue' }}>{item.price}</Text>
+        <View style={styles.iconContainer}>
+          <FontAwesome
+            name='bell'
+            size={18}
+            color='white'
+          />
+          <View style={styles.dot} />
         </View>
       </View>
-    );
-  };
+
+      <View style={{ paddingTop: rh(3) }}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder='Search for collections...'
+          placeholderTextColor={'#7B8691'}
+        />
+
+        <Ionicons
+          name='search-sharp'
+          size={22}
+          color='#7B8691'
+          style={styles.searchIcon}
+        />
+
+        <MaterialIcons
+          name='tune'
+          size={22}
+          color='#7B8691'
+          style={styles.tuneIcon}
+        />
+      </View>
+
+      <View style={{ paddingTop: rh(3) }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <HomeFilterButton label='All' />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Shoes'}
+          />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Apparel'}
+          />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Accessories'}
+          />
+        </ScrollView>
+      </View>
+
+      <View style={styles.titleSection}>
+        <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
+          Curated for you
+        </Text>
+        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+      </View>
+    </View>
+  );
+
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#0B0E14']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={StyleSheet.absoluteFill}
-    >
-      <>
-        {userDataLoading ? (
-          <View
-            style={{
-              flex: 1,
+    <View style={{ flex: 1 }}>
+      <LinearGradient
+        colors={['#1e1b4b', '#0B0E14']}
+        style={StyleSheet.absoluteFill}
+      />
 
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <ActivityIndicator
-              size='large'
-              color={Colors.acccentBlue}
-            />
-          </View>
-        ) : (
-          <View style={{ flex: 1 }}>
-            <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}
-                >
-                  <Image
-                    source={{ uri: userData?.profileUrl }}
-                    style={{ width: 45, height: 45, borderRadius: 22.5 }}
-                  />
-
-                  <View style={{ paddingStart: rw(5), flex: 1 }}>
-                    <Text style={{ color: '#7B8691', fontSize: 13 }}>
-                      WELCOME BACK
-                    </Text>
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontSize: 20,
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {userData?.fullName}
-                    </Text>
-                  </View>
-                </View>
-
-                <View
-                  style={{
-                    backgroundColor: '#21262E',
-                    padding: rw(3),
-                    borderRadius: 25,
-                    borderWidth: StyleSheet.hairlineWidth + 0.1,
-                    borderColor: 'white',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <FontAwesome
-                    name='bell'
-                    size={20}
-                    color='white'
-                  />
-                  <View style={{ position: 'absolute', right: 13, top: 15 }}>
-                    <View
-                      style={{
-                        backgroundColor: 'green',
-                        width: 7,
-                        height: 7,
-                        borderRadius: 20,
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-              <View style={{ paddingTop: rh(3) }}>
-                <TextInput
-                  style={{
-                    color: 'white',
-                    borderWidth: 1,
-                    fontSize: 17,
-                    height: 60,
-                    borderColor: Colors.acccentBlue,
-                    backgroundColor: '#21262E',
-                    paddingHorizontal: rw(11),
-                    borderRadius: 20,
-                    overflow: 'hidden',
-                  }}
-                  placeholder='Search for collections...'
-                  placeholderTextColor={'#7B8691'}
-                />
-                <View style={{ position: 'absolute', top: 43, left: 15 }}>
-                  <Ionicons
-                    name='search-sharp'
-                    size={24}
-                    color='#7B8691'
-                  />
-                </View>
-                <View style={{ position: 'absolute', top: 43, right: 15 }}>
-                  <MaterialIcons
-                    name='tune'
-                    size={24}
-                    color='#7B8691'
-                  />
-                </View>
-              </View>
-              <View style={{ paddingTop: rh(3) }}>
-                <ScrollView
-                  horizontal
-                  style={{
-                    width: '100%',
-                  }}
-                  contentContainerStyle={{
-                    flexGrow: 1,
-                    paddingBottom: rh(2),
-                  }}
-                  showsHorizontalScrollIndicator={false}
-                >
-                  <HomeFilterButton label='All' />
-                  <HomeFilterButton
-                    marginStartFilterButton={rw(3)}
-                    label={'Shoes'}
-                  />
-                  <HomeFilterButton
-                    marginStartFilterButton={rw(3)}
-                    label={'Apparel'}
-                  />
-                  <HomeFilterButton
-                    marginStartFilterButton={rw(3)}
-                    label={'Accessories'}
-                  />
-                </ScrollView>
-              </View>
-              <View
-                style={{
-                  paddingTop: rh(3),
-                  flexDirection: 'row',
-                  alignItems: 'baseline',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <View>
-                  <Text style={{ color: 'white', fontSize: 20 }}>
-                    Curated for you
-                  </Text>
-                </View>
-                <View>
-                  <Text style={{ color: 'lightblue', fontSize: 16 }}>
-                    View all
-                  </Text>
-                </View>
-              </View>
-              <View>
-                <FlatList
-                  data={dummyData}
-                  renderItem={({ item }) => <ProductRenderItem item={item} />}
-                />
-              </View>
-            </View>
-          </View>
-        )}
-      </>
-    </LinearGradient>
+      {userDataLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator
+            size='large'
+            color={Colors.acccentBlue}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={userData?.curatedItems}
+          numColumns={2}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={FlatListHeader}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: rh(5) }}
+          columnWrapperStyle={{ paddingHorizontal: rw(4), gap: rw(4) }}
+          renderItem={({ item }) => <ProductRenderItem item={item} />}
+        />
+      )}
+    </View>
   );
 };
 
 export default Home;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    backgroundColor: '#21262E',
+    padding: rw(3),
+    borderRadius: 25,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  dot: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    backgroundColor: 'green',
+    width: 7,
+    height: 7,
+    borderRadius: 5,
+  },
+  searchInput: {
+    color: 'white',
+    borderWidth: 1,
+    fontSize: 16,
+    height: 55,
+    borderColor: Colors.acccentBlue,
+    backgroundColor: '#21262E',
+    paddingHorizontal: rw(12),
+    borderRadius: 18,
+  },
+  searchIcon: {
+    position: 'absolute',
+    top: rh(5),
+    left: 15,
+  },
+  tuneIcon: {
+    position: 'absolute',
+    top: rh(5),
+    right: 15,
+  },
+  titleSection: {
+    paddingTop: rh(4),
+    paddingBottom: rh(2),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+});
