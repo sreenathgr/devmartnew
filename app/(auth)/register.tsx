@@ -120,7 +120,7 @@ const Register = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.replace('/(postAuth)/(tabs)/home');
+        router.replace('/(postAuth)/(drawer)/(tabs)/home');
       }
     });
 

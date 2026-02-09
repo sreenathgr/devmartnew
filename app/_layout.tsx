@@ -33,7 +33,7 @@ export default function RootLayout() {
     <SafeAreaView style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name='index' />
-        <Stack.Screen name='(postAuth)/(tabs)' />
+        <Stack.Screen name='(postAuth)/(drawer)' />
       </Stack>
       <StatusBar style='auto' />
     </SafeAreaView>
