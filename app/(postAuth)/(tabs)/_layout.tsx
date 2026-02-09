@@ -3,7 +3,7 @@ import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 const TabLayout = () => {
   const TabGradient = () => {
@@ -43,29 +43,37 @@ const TabLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
-        name='discover'
-        options={{
-          title: 'Discover',
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name='compass'
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name='cart'
         options={{
           title: 'Cart',
           tabBarIcon: ({ color }) => (
-            <SimpleLineIcons
-              name='handbag'
-              size={24}
-              color={color}
-            />
+            <View>
+              <SimpleLineIcons
+                name='handbag'
+                size={24}
+                color={color}
+              />
+              <View style={{ position: 'absolute', right: 0 }}>
+                <View
+                  style={{
+                    backgroundColor: 'purple',
+                    width: 13,
+                    height: 13,
+                    borderRadius: 20,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    style={{ color: 'white', fontSize: 8, fontWeight: 'bold' }}
+                  >
+                    2
+                  </Text>
+                </View>
+              </View>
+            </View>
           ),
         }}
       />
