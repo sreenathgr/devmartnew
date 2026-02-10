@@ -123,7 +123,6 @@ const Register = () => {
         router.replace('/(postAuth)/(drawer)/(tabs)/home');
       }
     });
-
     return () => unsubscribe();
   }, []);
   return (
