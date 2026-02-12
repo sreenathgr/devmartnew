@@ -1,3 +1,5 @@
+import ProfileListButton from '@/components/ProfileButton/ProfileButton';
+import ProfileButtonBottomDivider from '@/components/ProfileButtonBottomDivider/ProfileButtonBottomDivider';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -18,7 +20,11 @@ const Profile = () => {
       />
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: insets.bottom + 20,
+        }}
+        showsHorizontalScrollIndicator={false}
       >
         <View
           style={{
@@ -138,145 +144,102 @@ const Profile = () => {
             borderColor: 'white',
           }}
         >
-          <View
+          <ProfileListButton
+            LeftIconComponent={FontAwesome}
+            leftIconName='shopping-bag'
+            leftIconColour='green'
+            titleText='My Orders'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+
+          <ProfileButtonBottomDivider />
+
+          <ProfileListButton
+            LeftIconComponent={Entypo}
+            titleText='Addresses'
+            leftIconName={'location-pin'}
+            leftIconColour='red'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+          <ProfileButtonBottomDivider />
+
+          <ProfileListButton
+            LeftIconComponent={MaterialIcons}
+            leftIconName='payment'
+            leftIconColour='pink'
+            titleText='Payments'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+        </View>
+        <View
+          style={{
+            paddingTop: rh(2),
+            paddingStart: rw(3),
+            paddingBottom: rh(2),
+          }}
+        >
+          <Text
+            style={{ color: '#7B8691', fontFamily: 'Manrope', fontSize: 14 }}
+          >
+            PREFERENCES
+          </Text>
+        </View>
+        <View
+          style={{
+            backgroundColor: '#2d2d2d',
+
+            paddingBottom: rh(2),
+            borderRadius: 20,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: 'white',
+          }}
+        >
+          <ProfileListButton
+            LeftIconComponent={Ionicons}
+            titleText='Settings'
+            leftIconName={'settings'}
+            leftIconColour='white'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+          <ProfileButtonBottomDivider />
+          <ProfileListButton
+            LeftIconComponent={Ionicons}
+            titleText='Notification'
+            leftIconName={'notifications'}
+            leftIconColour='white'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+          <ProfileButtonBottomDivider />
+          <ProfileListButton
+            LeftIconComponent={Ionicons}
+            titleText='Help Center'
+            leftIconName={'help'}
+            leftIconColour='white'
+            RightIconComponent={Entypo}
+            rightIconName='chevron-right'
+            rightIconColour='#7B8691'
+          />
+        </View>
+        <View style={{ alignItems: 'center', paddingTop: rh(3) }}>
+          <Text
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-              paddingHorizontal: rw(5),
+              color: 'white',
+              fontFamily: 'Manrope',
+              fontStyle: 'italic',
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View
-                style={{
-                  backgroundColor: '#5F6B76',
-                  width: 40,
-                  height: 40,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: rw(2),
-                  borderRadius: 15,
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: 'white',
-                }}
-              >
-                <FontAwesome
-                  name='shopping-bag'
-                  size={18}
-                  color='green'
-                />
-              </View>
-              <View style={{ paddingStart: rw(2) }}>
-                <Text style={{ color: 'white', fontSize: 18 }}>My Orders</Text>
-              </View>
-            </View>
-            <View>
-              <Entypo
-                name='chevron-right'
-                size={24}
-                color='#7B8691'
-              />
-            </View>
-          </View>
-          <View style={{ paddingTop: rh(1) }}>
-            <View
-              style={{
-                borderColor: 'white',
-                borderWidth: StyleSheet.hairlineWidth,
-              }}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-              paddingHorizontal: rw(5),
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View
-                style={{
-                  backgroundColor: '#5F6B76',
-                  width: 40,
-                  height: 40,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: rw(2),
-                  borderRadius: 15,
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: 'white',
-                }}
-              >
-                <Entypo
-                  name='location-pin'
-                  size={24}
-                  color='red'
-                />
-              </View>
-              <View style={{ paddingStart: rw(2) }}>
-                <Text style={{ color: 'white', fontSize: 18 }}>Addresses</Text>
-              </View>
-            </View>
-            <View>
-              <Entypo
-                name='chevron-right'
-                size={24}
-                color='#7B8691'
-              />
-            </View>
-          </View>
-          <View style={{ paddingTop: rh(1) }}>
-            <View
-              style={{
-                borderColor: 'white',
-                borderWidth: StyleSheet.hairlineWidth,
-              }}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-              paddingHorizontal: rw(5),
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View
-                style={{
-                  backgroundColor: '#5F6B76',
-                  width: 40,
-                  height: 40,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: rw(2),
-                  borderRadius: 15,
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: 'white',
-                }}
-              >
-                <MaterialIcons
-                  name='payment'
-                  size={24}
-                  color='pink'
-                />
-              </View>
-              <View style={{ paddingStart: rw(2) }}>
-                <Text style={{ color: 'white', fontSize: 18 }}>Addresses</Text>
-              </View>
-            </View>
-            <View>
-              <Entypo
-                name='chevron-right'
-                size={24}
-                color='#7B8691'
-              />
-            </View>
-          </View>
+            APP VERSION 0.0.1
+          </Text>
         </View>
       </ScrollView>
     </View>

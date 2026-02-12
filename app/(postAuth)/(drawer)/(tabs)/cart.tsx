@@ -277,7 +277,8 @@ const Cart = () => {
         <FlatList
           style={{ flex: 1 }}
           data={MockData}
-          contentContainerStyle={{ paddingBottom: rh(10) }}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
           renderItem={cartItemsRenderItem}
           ListHeaderComponent={cartListHeaderComponent}
           ListFooterComponent={cartListFooterComponent}
