@@ -1,13 +1,15 @@
 import HomeFilterButton from '@/components/HomeFilterButton/HomeFilterButton';
 import { Colors } from '@/constants/Colors';
+import useFetch from '@/hooks/useFetch';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -43,21 +45,14 @@ const Home = () => {
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
+  const { data, productsLoading } = useFetch({
+    url: 'http://192.168.1.4:3000/shopease/products',
+  });
 
-  const dummyData: ProductProps[] = [
-    { id: '0', productImg: 'url/0', productName: 'Nike Shoes', price: '200' },
-    { id: '1', productImg: 'url/1', productName: 'Headset', price: '300' },
-    { id: '2', productImg: 'url/2', productName: 'Handbag', price: '150' },
-    { id: '3', productImg: 'url/3', productName: 'Laptop stand', price: '450' },
-    {
-      id: '4',
-      productImg: 'url/4',
-      productName: 'Samsung galaxy 50 pro',
-      price: '500',
-    },
-  ];
+  useEffect(() => {
+    console.log('data is', data);
+  }, [data]);
 
-  // 1. Render Item for Products
   const ProductRenderItem = ({ item }: { item: ProductProps }) => (
     <View
       style={{
@@ -180,7 +175,12 @@ const Home = () => {
           />
         </ScrollView>
       </View>
-
+      <View style={styles.titleSection}>
+        <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
+          Featured Products
+        </Text>
+        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+      </View>
       <View style={styles.titleSection}>
         <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
           Curated for you
@@ -189,6 +189,19 @@ const Home = () => {
       </View>
     </View>
   );
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        'http://192.168.1.4:3000/shopease/products',
+      );
+      if (response.status === 200) {
+        console.log('Data fetched successfully:', response.data.data[0]);
+      }
+    } catch (e: any) {
+      console.error('Error fetching data:', e.message);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
