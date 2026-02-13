@@ -1,4 +1,5 @@
 import HomeFilterButton from '@/components/HomeFilterButton/HomeFilterButton';
+import AppConstants from '@/constants/appConstants';
 import { Colors } from '@/constants/Colors';
 import useFetch from '@/hooks/useFetch';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
@@ -6,10 +7,9 @@ import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -45,12 +45,15 @@ const Home = () => {
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
-  const { data, productsLoading } = useFetch({
-    url: 'http://192.168.1.4:3000/shopease/products',
+  const { data, loading: productsLoading } = useFetch<ProductProps[]>({
+    url: `${AppConstants.API_BASE_URL}/shopease/products`,
   });
+  const [FeaturedProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
+
+  const isAppLoading = userDataLoading || productsLoading;
 
   useEffect(() => {
-    console.log('data is', data);
+    setFeaturedProducts(data || []);
   }, [data]);
 
   const ProductRenderItem = ({ item }: { item: ProductProps }) => (
@@ -181,6 +184,15 @@ const Home = () => {
         </Text>
         <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
       </View>
+      <FlatList
+        numColumns={2}
+        data={FeaturedProducts}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: rh(5) }}
+        columnWrapperStyle={{ gap: rw(4) }}
+        renderItem={({ item }) => <ProductRenderItem item={item} />}
+        keyExtractor={(item) => item.id}
+      />
       <View style={styles.titleSection}>
         <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
           Curated for you
@@ -190,19 +202,6 @@ const Home = () => {
     </View>
   );
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        'http://192.168.1.4:3000/shopease/products',
-      );
-      if (response.status === 200) {
-        console.log('Data fetched successfully:', response.data.data[0]);
-      }
-    } catch (e: any) {
-      console.error('Error fetching data:', e.message);
-    }
-  };
-
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
@@ -210,7 +209,7 @@ const Home = () => {
         style={StyleSheet.absoluteFill}
       />
 
-      {userDataLoading ? (
+      {isAppLoading ? (
         <View style={styles.center}>
           <ActivityIndicator
             size='large'

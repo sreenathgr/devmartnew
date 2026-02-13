@@ -110,6 +110,9 @@ const Register = () => {
         email: user.email,
         fullName: fullName,
         createdAt: serverTimestamp(),
+        profileUrl: null,
+        wishlist: [],
+        curatedItems: [],
       });
       console.log('user registered', user.email);
     } catch (error: any) {

@@ -6,8 +6,8 @@ type useFetchProps = {
   config?: AxiosRequestConfig;
 };
 
-const useFetch = ({ url, config = {} }: useFetchProps) => {
-  const [data, setData] = useState(null);
+const useFetch = <T,>({ url, config = {} }: useFetchProps) => {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,7 +15,9 @@ const useFetch = ({ url, config = {} }: useFetchProps) => {
       try {
         // Axios handles an empty config object perfectly
         const response = await axios.get(url, config);
-        setData(response.data.data);
+        if (response.status === 200) {
+          setData(response.data.data);
+        }
       } catch (err) {
         console.error(err);
       } finally {

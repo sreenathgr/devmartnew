@@ -90,6 +90,19 @@ const TabLayout = () => {
           ),
         }}
       />
+      <Tabs.Screen
+        name='wishlist'
+        options={{
+          title: 'Wishlist',
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name='heart'
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 };
