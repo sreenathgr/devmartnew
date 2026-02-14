@@ -8,6 +8,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { Timestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
@@ -42,6 +43,7 @@ type ProductProps = {
 
 const Home = () => {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const {
     userData,
     userDataLoading,
@@ -69,7 +71,8 @@ const Home = () => {
     item: ProductProps;
     onToggleFavorite: (id: string) => void;
   }) => (
-    <View
+    <Pressable
+      onPress={() => router.push('/(postAuth)/productDetails')}
       style={{
         backgroundColor: '#21262E',
         maxWidth: '48%',
@@ -123,7 +126,7 @@ const Home = () => {
         {item.productName}
       </Text>
       <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
-    </View>
+    </Pressable>
   );
 
   const toggleFavoriteForFeaturedProducts = (productId: string) => {

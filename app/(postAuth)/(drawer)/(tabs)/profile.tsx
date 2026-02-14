@@ -109,11 +109,19 @@ const Profile = () => {
                 }}
               >
                 <View style={{ paddingTop: rh(3) }}>
-                  <Image
-                    source={require('@/assets/images/dummyprofile.png')}
-                    style={{ width: 120, height: 120, borderRadius: 50 }}
-                    resizeMode='cover'
-                  />
+                  {userData?.profileUrl ? (
+                    <Image
+                      source={{ uri: userData?.profileUrl }}
+                      style={{ width: 120, height: 120, borderRadius: 50 }}
+                      resizeMode='cover'
+                    />
+                  ) : (
+                    <Image
+                      source={require('@/assets/images/dummyprofile.png')}
+                      style={{ width: 120, height: 120, borderRadius: 50 }}
+                      resizeMode='cover'
+                    />
+                  )}
                 </View>
                 <View style={{ paddingTop: rh(1) }}>
                   <Text

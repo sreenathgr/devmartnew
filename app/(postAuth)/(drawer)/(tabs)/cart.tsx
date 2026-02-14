@@ -1,3 +1,4 @@
+import { useCartStore } from '@/hooks/useCart';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -12,7 +13,6 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 type cartItemsType = {
   id: string;
   imgUrl: string;
@@ -24,33 +24,7 @@ type cartItemsType = {
 
 const Cart = () => {
   const insets = useSafeAreaInsets();
-
-  const MockData = [
-    {
-      id: '0',
-      imgUrl: 'url/0',
-      productName: 'Leather Tote',
-      variantName: 'Cream White',
-      price: 120.0,
-      itemCount: 10,
-    },
-    {
-      id: '1',
-      imgUrl: 'url/1',
-      productName: 'Cotton Crew Tee',
-      variantName: 'Premium White',
-      price: 35.0,
-      itemCount: 0,
-    },
-    {
-      id: '2',
-      imgUrl: 'url/2',
-      productName: 'Ceramic Mug',
-      variantName: 'Matte Black',
-      price: 120.0,
-      itemCount: 0,
-    },
-  ];
+  const cartListData = useCartStore((state) => state.cartItems);
 
   const cartItemsRenderItem = ({ item }: { item: cartItemsType }) => {
     return (
@@ -276,7 +250,7 @@ const Cart = () => {
       <View style={{ flex: 1, paddingHorizontal: rw(3) }}>
         <FlatList
           style={{ flex: 1 }}
-          data={MockData}
+          data={cartListData}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
           renderItem={cartItemsRenderItem}
