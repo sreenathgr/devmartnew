@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -36,6 +37,7 @@ type ProductProps = {
   productImg: string;
   productName: string;
   price: string;
+  isFavorited: boolean;
 };
 
 const Home = () => {
@@ -49,14 +51,24 @@ const Home = () => {
     url: `${AppConstants.API_BASE_URL}/shopease/products`,
   });
   const [FeaturedProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
-
+  const [curatedProducts, setCuratedProducts] = useState<ProductProps[]>([]);
   const isAppLoading = userDataLoading || productsLoading;
 
   useEffect(() => {
     setFeaturedProducts(data || []);
   }, [data]);
 
-  const ProductRenderItem = ({ item }: { item: ProductProps }) => (
+  useEffect(() => {
+    setCuratedProducts(userData?.curatedItems || []);
+  }, [userData]);
+
+  const ProductRenderItem = ({
+    item,
+    onToggleFavorite,
+  }: {
+    item: ProductProps;
+    onToggleFavorite: (id: string) => void;
+  }) => (
     <View
       style={{
         backgroundColor: '#21262E',
@@ -74,24 +86,38 @@ const Home = () => {
           style={{ width: 150, height: 150, borderRadius: 20 }}
           resizeMode='cover'
         />
-        <View
-          style={{
-            position: 'absolute',
-            backgroundColor: '#21262E',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: rw(2),
-            borderRadius: 10,
-            right: 5,
-            top: 5,
+        <Pressable
+          onPress={() => {
+            onToggleFavorite(item.id);
           }}
+          style={({ pressed }) => [
+            {
+              position: 'absolute',
+              backgroundColor: '#21262E',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: rw(2),
+              borderRadius: 10,
+              right: 5,
+              top: 5,
+              opacity: pressed ? 0.5 : 1,
+            },
+          ]}
         >
-          <FontAwesome
-            name='heart'
-            size={15}
-            color='white'
-          />
-        </View>
+          {item?.isFavorited ? (
+            <FontAwesome
+              name='heart'
+              size={15}
+              color='red'
+            />
+          ) : (
+            <FontAwesome
+              name='heart-o'
+              size={15}
+              color='white'
+            />
+          )}
+        </Pressable>
       </View>
       <Text style={{ color: 'white', marginTop: rh(1), fontWeight: '600' }}>
         {item.productName}
@@ -99,6 +125,28 @@ const Home = () => {
       <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
     </View>
   );
+
+  const toggleFavoriteForFeaturedProducts = (productId: string) => {
+    setFeaturedProducts((preFeaturedProducts) => {
+      return preFeaturedProducts.map((product) => {
+        if (product.id === productId) {
+          return { ...product, isFavorited: !product.isFavorited };
+        }
+        return product;
+      });
+    });
+  };
+
+  const toggleFavoriteForCuratedProducts = (productId: string) => {
+    setCuratedProducts((preCuratedProductsData) => {
+      return preCuratedProductsData.map((product) => {
+        if (product.id === productId) {
+          return { ...product, isFavorited: !product.isFavorited };
+        }
+        return product;
+      });
+    });
+  };
 
   const FlatListHeader = () => (
     <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
@@ -190,7 +238,12 @@ const Home = () => {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: rh(5) }}
         columnWrapperStyle={{ gap: rw(4) }}
-        renderItem={({ item }) => <ProductRenderItem item={item} />}
+        renderItem={({ item }) => (
+          <ProductRenderItem
+            item={item}
+            onToggleFavorite={toggleFavoriteForFeaturedProducts}
+          />
+        )}
         keyExtractor={(item) => item.id}
       />
       <View style={styles.titleSection}>
@@ -218,14 +271,19 @@ const Home = () => {
         </View>
       ) : (
         <FlatList
-          data={userData?.curatedItems}
+          data={curatedProducts}
           numColumns={2}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={FlatListHeader}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: rh(5) }}
           columnWrapperStyle={{ paddingHorizontal: rw(4), gap: rw(4) }}
-          renderItem={({ item }) => <ProductRenderItem item={item} />}
+          renderItem={({ item }) => (
+            <ProductRenderItem
+              item={item}
+              onToggleFavorite={toggleFavoriteForCuratedProducts}
+            />
+          )}
         />
       )}
     </View>
