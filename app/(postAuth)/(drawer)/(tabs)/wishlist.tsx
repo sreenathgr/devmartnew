@@ -106,6 +106,30 @@ const Wishlist = () => {
           {item.productName}
         </Text>
         <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
+        <View style={{ paddingTop: rh(2) }}>
+          <Pressable
+            style={({ pressed }) => [
+              {
+                borderRadius: 12,
+                backgroundColor: 'purple',
+                paddingHorizontal: rw(8),
+                paddingVertical: rh(1.5),
+                opacity: pressed ? 0.5 : 1,
+                alignItems: 'center',
+              },
+            ]}
+          >
+            <Text
+              style={{
+                color: 'white',
+                fontFamily: 'Manrope',
+                fontWeight: 'bold',
+              }}
+            >
+              Move to Cart
+            </Text>
+          </Pressable>
+        </View>
       </View>
     );
   };

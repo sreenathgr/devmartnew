@@ -39,6 +39,7 @@ type ProductProps = {
   productName: string;
   price: string;
   isFavorited: boolean;
+  inCart: boolean;
 };
 
 const Home = () => {
@@ -67,9 +68,11 @@ const Home = () => {
   const ProductRenderItem = ({
     item,
     onToggleFavorite,
+    onToggleAddToCart,
   }: {
     item: ProductProps;
     onToggleFavorite: (id: string) => void;
+    onToggleAddToCart: (id: string) => void;
   }) => (
     <Pressable
       onPress={() => router.push('/(postAuth)/productDetails')}
@@ -126,6 +129,33 @@ const Home = () => {
         {item.productName}
       </Text>
       <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
+      <View style={{ paddingTop: rh(2) }}>
+        <Pressable
+          onPress={() => {
+            onToggleAddToCart(item.id);
+          }}
+          style={({ pressed }) => [
+            {
+              borderRadius: 12,
+              backgroundColor: item?.inCart ? 'green' : 'purple',
+              paddingHorizontal: rw(8),
+              paddingVertical: rh(1.5),
+              opacity: pressed ? 0.5 : 1,
+              alignItems: 'center',
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: 'white',
+              fontFamily: 'Manrope',
+              fontWeight: 'bold',
+            }}
+          >
+            {item.inCart ? 'In Cart' : 'Move to Cart'}
+          </Text>
+        </Pressable>
+      </View>
     </Pressable>
   );
 
@@ -133,7 +163,10 @@ const Home = () => {
     setFeaturedProducts((preFeaturedProducts) => {
       return preFeaturedProducts.map((product) => {
         if (product.id === productId) {
-          return { ...product, isFavorited: !product.isFavorited };
+          return {
+            ...product,
+            isFavorited: !product.isFavorited,
+          };
         }
         return product;
       });
@@ -144,7 +177,40 @@ const Home = () => {
     setCuratedProducts((preCuratedProductsData) => {
       return preCuratedProductsData.map((product) => {
         if (product.id === productId) {
-          return { ...product, isFavorited: !product.isFavorited };
+          return {
+            ...product,
+            isFavorited: !product.isFavorited,
+          };
+        }
+        return product;
+      });
+    });
+  };
+
+  const toggleAddToCartButtonForCuratedProducts = (productId: string) => {
+    setCuratedProducts((preCuratedProductsData) => {
+      return preCuratedProductsData.map((product) => {
+        if (product.id === productId) {
+          return {
+            ...product,
+
+            inCart: !product.inCart,
+          };
+        }
+        return product;
+      });
+    });
+  };
+
+  const toggleAddToCartButtonForFeaturedProducts = (productId: string) => {
+    setFeaturedProducts((preFeaturedProducts) => {
+      return preFeaturedProducts.map((product) => {
+        if (product.id === productId) {
+          return {
+            ...product,
+
+            inCart: !product.inCart,
+          };
         }
         return product;
       });
@@ -245,6 +311,7 @@ const Home = () => {
           <ProductRenderItem
             item={item}
             onToggleFavorite={toggleFavoriteForFeaturedProducts}
+            onToggleAddToCart={toggleAddToCartButtonForFeaturedProducts}
           />
         )}
         keyExtractor={(item) => item.id}
@@ -285,6 +352,7 @@ const Home = () => {
             <ProductRenderItem
               item={item}
               onToggleFavorite={toggleFavoriteForCuratedProducts}
+              onToggleAddToCart={toggleAddToCartButtonForCuratedProducts}
             />
           )}
         />
