@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type cartItemsType = {
   id: string;
-  imgUrl: string;
+  productImg: string;
   productName: string;
   variantName: string;
   price: number;
@@ -41,7 +41,7 @@ const Cart = () => {
       >
         <View>
           <Image
-            source={require('@/assets/images/dummyprofile.png')}
+            source={{ uri: item?.productImg }}
             style={{ width: 85, height: 85 }}
             resizeMode='contain'
           />
@@ -55,14 +55,14 @@ const Cart = () => {
               {item?.productName}
             </Text>
           </View>
-          <View>
+          {/* <View>
             <Text
               style={{ color: 'white' }}
               numberOfLines={1}
             >
               {item?.variantName}
             </Text>
-          </View>
+          </View> */}
         </View>
         <View style={{ justifyContent: 'space-between' }}>
           <View>

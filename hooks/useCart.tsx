@@ -2,9 +2,9 @@ import { create } from 'zustand';
 
 type cartItemsType = {
   id: string;
-  imgUrl: string;
+  productImg: string;
   productName: string;
-  variantName: string;
+
   price: number;
   itemCount: number;
 };
@@ -12,6 +12,8 @@ type cartItemsType = {
 type CartState = {
   cartItems: cartItemsType[];
   addToCart: (item: cartItemsType) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
 };
@@ -23,7 +25,7 @@ const MockData = [
     productName: 'Leather Tote',
     variantName: 'Cream White',
     price: 120.0,
-    itemCount: 10,
+    itemCount: 0,
   },
   {
     id: '1',
@@ -44,10 +46,36 @@ const MockData = [
 ];
 
 export const useCartStore = create<CartState>((set) => ({
-  cartItems: MockData,
+  cartItems: [],
   addToCart: (item) =>
+    set((state) => {
+      const alreadyInCart = state.cartItems.some(
+        (cartItem) => cartItem.id === item.id,
+      );
+
+      if (alreadyInCart) {
+        return state;
+      }
+
+      return {
+        cartItems: [...state.cartItems, item],
+      };
+    }),
+  increaseQuantity: (id) =>
     set((state) => ({
-      cartItems: [...state.cartItems, item],
+      cartItems: state.cartItems.map((item) =>
+        item.id === id
+          ? { ...item, quantity: (item.itemCount || 0) + 1 }
+          : item,
+      ),
+    })),
+  decreaseQuantity: (id) =>
+    set((state) => ({
+      cartItems: state.cartItems.map((item) =>
+        item.id === id
+          ? { ...item, quantity: (item.itemCount || 0) - 1 }
+          : item,
+      ),
     })),
   removeFromCart: (id) =>
     set((state) => ({

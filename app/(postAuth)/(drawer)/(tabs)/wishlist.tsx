@@ -28,6 +28,7 @@ type WishlistProductProps = {
   productName: string;
   price: string;
   isFavorited: boolean;
+  inCart: boolean;
 };
 
 const Wishlist = () => {
@@ -38,6 +39,19 @@ const Wishlist = () => {
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
   const [wishListData, setWishListData] = useState<WishlistProductProps[]>([]);
+  const toggleAddToCartButtonForWishlist = (productId: string) => {
+    setWishListData((preWishListData) => {
+      return preWishListData.map((product) => {
+        if (product.id === productId) {
+          return {
+            ...product,
+            inCart: !product.inCart,
+          };
+        }
+        return product;
+      });
+    });
+  };
 
   useEffect(() => {
     if (userData) {
@@ -47,9 +61,11 @@ const Wishlist = () => {
   const RenderWishListItem = ({
     item,
     onToggleFavorite,
+    onToggleAddToCart,
   }: {
     item: WishlistProductProps;
     onToggleFavorite: (id: string) => void;
+    onToggleAddToCart: (id: string) => void;
   }) => {
     return (
       <View
@@ -108,10 +124,13 @@ const Wishlist = () => {
         <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
         <View style={{ paddingTop: rh(2) }}>
           <Pressable
+            onPress={() => {
+              onToggleAddToCart(item.id);
+            }}
             style={({ pressed }) => [
               {
                 borderRadius: 12,
-                backgroundColor: 'purple',
+                backgroundColor: item?.inCart ? 'green' : 'purple',
                 paddingHorizontal: rw(8),
                 paddingVertical: rh(1.5),
                 opacity: pressed ? 0.5 : 1,
@@ -126,7 +145,7 @@ const Wishlist = () => {
                 fontWeight: 'bold',
               }}
             >
-              Move to Cart
+              {item.inCart ? 'In Cart' : 'Move to Cart'}
             </Text>
           </Pressable>
         </View>
@@ -185,6 +204,7 @@ const Wishlist = () => {
           <RenderWishListItem
             item={item}
             onToggleFavorite={toggleFavorite}
+            onToggleAddToCart={toggleAddToCartButtonForWishlist}
           />
         )}
         keyExtractor={(item) => item.id}

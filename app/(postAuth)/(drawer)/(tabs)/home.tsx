@@ -1,6 +1,7 @@
 import HomeFilterButton from '@/components/HomeFilterButton/HomeFilterButton';
 import AppConstants from '@/constants/appConstants';
 import { Colors } from '@/constants/Colors';
+import { useCartStore } from '@/hooks/useCart';
 import useFetch from '@/hooks/useFetch';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
@@ -45,6 +46,8 @@ type ProductProps = {
 const Home = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
   const {
     userData,
     userDataLoading,
@@ -191,6 +194,18 @@ const Home = () => {
     setCuratedProducts((preCuratedProductsData) => {
       return preCuratedProductsData.map((product) => {
         if (product.id === productId) {
+          if (!product.inCart) {
+            addToCart({
+              id: product.id,
+              productImg: product.productImg,
+              productName: product.productName,
+              price: Number(product.price),
+              itemCount: 0,
+            });
+          }
+          if (product.inCart) {
+            removeFromCart(product.id);
+          }
           return {
             ...product,
 
