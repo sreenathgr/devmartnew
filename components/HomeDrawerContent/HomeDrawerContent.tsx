@@ -87,7 +87,7 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
                 overflow: 'hidden',
               }}
             >
-              {userData?.profileUrl ? (
+              {userData && userData.profileUrl ? (
                 <Image
                   source={{ uri: userData?.profileUrl }}
                   resizeMode='contain'
@@ -103,11 +103,11 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
             </View>
             <View style={{ paddingTop: '7%' }}>
               <Text style={{ color: 'white', fontSize: 20 }}>
-                {userData.fullName}
+                {userData?.fullName}
               </Text>
             </View>
             <View>
-              <Text style={{ color: '#7B8691' }}>{userData.email}</Text>
+              <Text style={{ color: '#7B8691' }}>{userData?.email}</Text>
             </View>
           </View>
           <View style={{ paddingTop: rw(7) }}>

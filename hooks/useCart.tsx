@@ -65,7 +65,7 @@ export const useCartStore = create<CartState>((set) => ({
     set((state) => ({
       cartItems: state.cartItems.map((item) =>
         item.id === id
-          ? { ...item, quantity: (item.itemCount || 0) + 1 }
+          ? { ...item, itemCount: (item.itemCount || 0) + 1 }
           : item,
       ),
     })),
@@ -73,7 +73,7 @@ export const useCartStore = create<CartState>((set) => ({
     set((state) => ({
       cartItems: state.cartItems.map((item) =>
         item.id === id
-          ? { ...item, quantity: (item.itemCount || 0) - 1 }
+          ? { ...item, itemCount: (item.itemCount || 0) - 1 }
           : item,
       ),
     })),

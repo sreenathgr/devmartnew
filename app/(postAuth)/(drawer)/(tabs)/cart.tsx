@@ -3,7 +3,7 @@ import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   FlatList,
   Image,
@@ -13,11 +13,12 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 type cartItemsType = {
   id: string;
   productImg: string;
   productName: string;
-  variantName: string;
+
   price: number;
   itemCount: number;
 };
@@ -25,6 +26,14 @@ type cartItemsType = {
 const Cart = () => {
   const insets = useSafeAreaInsets();
   const cartListData = useCartStore((state) => state.cartItems);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const increaseQuantity = useCartStore((state) => state.increaseQuantity);
+  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+  const cartItemTotal = useMemo(() => {
+    return Math.round(
+      cartListData.reduce((acc, item) => acc + item.price * item.itemCount, 0),
+    );
+  }, [cartListData]);
 
   const cartItemsRenderItem = ({ item }: { item: cartItemsType }) => {
     return (
@@ -32,7 +41,6 @@ const Cart = () => {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-
           backgroundColor: '#2d2d2d',
           padding: rw(5),
           margin: rw(2),
@@ -55,21 +63,26 @@ const Cart = () => {
               {item?.productName}
             </Text>
           </View>
-          {/* <View>
-            <Text
-              style={{ color: 'white' }}
-              numberOfLines={1}
-            >
-              {item?.variantName}
-            </Text>
-          </View> */}
-        </View>
-        <View style={{ justifyContent: 'space-between' }}>
           <View>
-            <Text style={{ color: 'white', textAlign: 'right', fontSize: 18 }}>
-              ${item?.price.toString()}
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 18,
+                textAlignVertical: 'center',
+              }}
+            >
+              ${Math.round(item?.price * item.itemCount).toString()}
             </Text>
           </View>
+        </View>
+        <View style={{ justifyContent: 'space-between' }}>
+          <Pressable onPress={() => removeFromCart(item.id)}>
+            <Text
+              style={{ color: '#7B8691', textAlign: 'right', fontSize: 18 }}
+            >
+              X
+            </Text>
+          </Pressable>
           <View style={{ paddingTop: rh(3) }}>
             <View
               style={{
@@ -80,24 +93,34 @@ const Cart = () => {
                 borderRadius: 20,
               }}
             >
-              <View>
-                <Text style={{ color: 'white', fontSize: 18 }}>-</Text>
-              </View>
+              <Pressable
+                onPress={() => decreaseQuantity(item.id)}
+                hitSlop={3}
+              >
+                <Text style={{ color: 'white', fontSize: 23 }}>-</Text>
+              </Pressable>
               <View style={{ paddingStart: rw(3) }}>
-                <Text style={{ color: 'white', fontSize: 18 }}>
-                  {item.itemCount}
+                <Text style={{ color: 'white', fontSize: 23 }}>
+                  {item.itemCount.toString()}
                 </Text>
               </View>
-              <View style={{ paddingStart: rw(3) }}>
-                <Text style={{ color: 'white', fontSize: 18 }}>+</Text>
-              </View>
+              <Pressable
+                hitSlop={3}
+                style={{ paddingStart: rw(3) }}
+                onPress={() => {
+                  increaseQuantity(item.id);
+                }}
+              >
+                <Text style={{ color: 'white', fontSize: 23 }}>+</Text>
+              </Pressable>
             </View>
           </View>
         </View>
       </View>
     );
   };
-  const cartListHeaderComponent = () => {
+  const CartListHeaderComponent = () => {
+    const clearCart = useCartStore((state) => state.clearCart);
     return (
       <View style={{ paddingBottom: rh(3) }}>
         <View
@@ -127,117 +150,150 @@ const Cart = () => {
               Cart
             </Text>
           </View>
-          <View>
+          <Pressable
+            onPress={() => clearCart()}
+            disabled={cartListData.length === 0}
+          >
             <Text
-              style={{ color: 'white', fontFamily: 'Manrope', fontSize: 18 }}
+              style={{
+                color: cartListData.length === 0 ? '#7B8691' : 'white',
+                fontFamily: 'Manrope',
+                fontSize: 18,
+              }}
             >
               Clear
             </Text>
-          </View>
+          </Pressable>
         </View>
       </View>
     );
   };
-  const cartListFooterComponent = () => {
+  const CartListFooterComponent = () => {
     return (
       <View>
-        <View style={{ paddingTop: rh(3) }}>
-          <View
-            style={{
-              borderWidth: StyleSheet.hairlineWidth,
-              borderColor: '#7B8691',
-            }}
-          />
-        </View>
-        <View style={{ paddingHorizontal: rw(5), paddingTop: rh(2) }}>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
+        {cartListData.length === 0 ? (
+          <>
             <View>
-              <Text style={{ color: '#7B8691' }}>Subtotal</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  textAlign: 'center',
+                  fontFamily: 'Manrope',
+                }}
+              >
+                Cart is Empty. Add Items to your Cart
+              </Text>
             </View>
-            <View>
-              <Text style={{ color: '#7B8691' }}>$214.00</Text>
+          </>
+        ) : (
+          <>
+            <View style={{ paddingTop: rh(3) }}>
+              <View
+                style={{
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: '#7B8691',
+                }}
+              />
             </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-            }}
-          >
-            <View>
-              <Text style={{ color: '#7B8691' }}>Shipping</Text>
-            </View>
-            <View>
-              <Text style={{ color: '#7B8691' }}>FREE</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-            }}
-          >
-            <View>
-              <Text style={{ color: '#7B8691' }}>Estimated Tax</Text>
-            </View>
-            <View>
-              <Text style={{ color: '#7B8691' }}>$0.00</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingTop: rh(1),
-              alignItems: 'center',
-            }}
-          >
-            <View>
-              <Text style={{ color: 'white', fontSize: 18 }}>Total</Text>
-            </View>
-            <View>
-              <Text style={{ color: 'white', fontSize: 25 }}>$214.00</Text>
-            </View>
-          </View>
-          <View style={{ paddingTop: rh(3) }}>
-            <Pressable
-              style={({ pressed }) => [
-                {
-                  backgroundColor: 'white',
+            <View style={{ paddingHorizontal: rw(5), paddingTop: rh(2) }}>
+              <View
+                style={{
                   flexDirection: 'row',
-                  justifyContent: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <View>
+                  <Text style={{ color: '#7B8691' }}>Subtotal</Text>
+                </View>
+                <View>
+                  <Text style={{ color: '#7B8691' }}>
+                    ${cartItemTotal.toString()}
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingTop: rh(1),
+                }}
+              >
+                <View>
+                  <Text style={{ color: '#7B8691' }}>Shipping</Text>
+                </View>
+                <View>
+                  <Text style={{ color: '#7B8691' }}>FREE</Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingTop: rh(1),
+                }}
+              >
+                <View>
+                  <Text style={{ color: '#7B8691' }}>Estimated Tax</Text>
+                </View>
+                <View>
+                  <Text style={{ color: '#7B8691' }}>$0.00</Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingTop: rh(1),
                   alignItems: 'center',
-                  height: 60,
-                  borderRadius: 20,
-                  opacity: pressed ? 0.5 : 1,
-                },
-              ]}
-            >
-              <View>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontFamily: 'Manrope',
-                    fontWeight: 'bold',
-                  }}
+                }}
+              >
+                <View>
+                  <Text style={{ color: 'white', fontSize: 18 }}>Total</Text>
+                </View>
+                <View>
+                  <Text style={{ color: 'white', fontSize: 25 }}>
+                    ${cartItemTotal.toString()}
+                  </Text>
+                </View>
+              </View>
+              <View style={{ paddingTop: rh(3) }}>
+                <Pressable
+                  style={({ pressed }) => [
+                    {
+                      backgroundColor: 'white',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: 60,
+                      borderRadius: 20,
+                      opacity: pressed ? 0.5 : 1,
+                    },
+                  ]}
                 >
-                  Proceed to Checkout
-                </Text>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontFamily: 'Manrope',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      Proceed to Checkout
+                    </Text>
+                  </View>
+                  <View style={{ paddingStart: rw(3) }}>
+                    <AntDesign
+                      name='arrow-right'
+                      size={18}
+                      color='black'
+                    />
+                  </View>
+                </Pressable>
               </View>
-              <View style={{ paddingStart: rw(3) }}>
-                <AntDesign
-                  name='arrow-right'
-                  size={18}
-                  color='black'
-                />
-              </View>
-            </Pressable>
-          </View>
-        </View>
+            </View>
+          </>
+        )}
       </View>
     );
   };
@@ -254,8 +310,8 @@ const Cart = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
           renderItem={cartItemsRenderItem}
-          ListHeaderComponent={cartListHeaderComponent}
-          ListFooterComponent={cartListFooterComponent}
+          ListHeaderComponent={CartListHeaderComponent}
+          ListFooterComponent={CartListFooterComponent}
           keyExtractor={(item: cartItemsType) => item.id}
         />
       </View>

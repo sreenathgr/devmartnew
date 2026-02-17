@@ -221,6 +221,18 @@ const Home = () => {
     setFeaturedProducts((preFeaturedProducts) => {
       return preFeaturedProducts.map((product) => {
         if (product.id === productId) {
+          if (!product.inCart) {
+            addToCart({
+              id: product.id,
+              productImg: product.productImg,
+              productName: product.productName,
+              price: Number(product.price),
+              itemCount: 0,
+            });
+          }
+          if (product.inCart) {
+            removeFromCart(product.id);
+          }
           return {
             ...product,
 

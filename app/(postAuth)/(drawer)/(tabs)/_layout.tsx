@@ -1,3 +1,4 @@
+import { useCartStore } from '@/hooks/useCart';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,6 +17,7 @@ const TabLayout = () => {
       />
     );
   };
+  const cartListData = useCartStore((state) => state.cartItems);
   return (
     <Tabs
       screenOptions={{
@@ -69,7 +71,7 @@ const TabLayout = () => {
                   <Text
                     style={{ color: 'white', fontSize: 8, fontWeight: 'bold' }}
                   >
-                    2
+                    {cartListData.length}
                   </Text>
                 </View>
               </View>
