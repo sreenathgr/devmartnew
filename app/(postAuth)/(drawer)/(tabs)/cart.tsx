@@ -1,7 +1,6 @@
 import { useCartStore } from '@/hooks/useCart';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useMemo } from 'react';
 import {
@@ -131,13 +130,7 @@ const Cart = () => {
             alignItems: 'center',
           }}
         >
-          <View>
-            <Entypo
-              name='chevron-left'
-              size={38}
-              color='white'
-            />
-          </View>
+          <View />
           <View>
             <Text
               style={{

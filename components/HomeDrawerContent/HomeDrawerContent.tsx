@@ -1,5 +1,6 @@
 import { auth } from '@/config/firebase/firebaseConfig';
 import { Colors } from '@/constants/Colors';
+import { useCartStore } from '@/hooks/useCart';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Feather from '@expo/vector-icons/Feather';
@@ -16,6 +17,7 @@ import HomeDrawerButton from '../HomeDrawerButton/HomeDrawerButton';
 const HomeDrawerContent = (props: DrawerContentComponentProps) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const clearCart = useCartStore((state) => state.clearCart);
   const { userData, userDataLoading } = useGetCurrentUserData();
   const handleLogout = async () => {
     try {
@@ -29,13 +31,13 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         console.log('Listener detected logout, redirecting...');
-        // Close drawer and send user back to the starting point (Splash/Index)
+        clearCart();
         props.navigation.closeDrawer();
         router.replace('/(auth)/login');
       }
     });
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
   if (userDataLoading) {

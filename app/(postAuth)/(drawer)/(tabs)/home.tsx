@@ -46,6 +46,7 @@ type ProductProps = {
 const Home = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const cartItems = useCartStore((state) => state.cartItems);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const {
@@ -56,6 +57,7 @@ const Home = () => {
   const { data, loading: productsLoading } = useFetch<ProductProps[]>({
     url: `${AppConstants.API_BASE_URL}/shopease/products`,
   });
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [FeaturedProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
   const [curatedProducts, setCuratedProducts] = useState<ProductProps[]>([]);
   const isAppLoading = userDataLoading || productsLoading;
@@ -71,96 +73,107 @@ const Home = () => {
   const ProductRenderItem = ({
     item,
     onToggleFavorite,
-    onToggleAddToCart,
   }: {
     item: ProductProps;
     onToggleFavorite: (id: string) => void;
-    onToggleAddToCart: (id: string) => void;
-  }) => (
-    <Pressable
-      onPress={() => router.push('/(postAuth)/productDetails')}
-      style={{
-        backgroundColor: '#21262E',
-        maxWidth: '48%',
-        flex: 1,
-        paddingVertical: rh(3),
-        alignItems: 'center',
-        borderRadius: 20,
-        marginBottom: rh(2),
-      }}
-    >
-      <View>
-        <Image
-          source={{ uri: item.productImg }}
-          style={{ width: 150, height: 150, borderRadius: 20 }}
-          resizeMode='cover'
-        />
-        <Pressable
-          onPress={() => {
-            onToggleFavorite(item.id);
-          }}
-          style={({ pressed }) => [
-            {
-              position: 'absolute',
-              backgroundColor: '#21262E',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: rw(2),
-              borderRadius: 10,
-              right: 5,
-              top: 5,
-              opacity: pressed ? 0.5 : 1,
-            },
-          ]}
-        >
-          {item?.isFavorited ? (
-            <FontAwesome
-              name='heart'
-              size={15}
-              color='red'
-            />
-          ) : (
-            <FontAwesome
-              name='heart-o'
-              size={15}
-              color='white'
-            />
-          )}
-        </Pressable>
-      </View>
-      <Text style={{ color: 'white', marginTop: rh(1), fontWeight: '600' }}>
-        {item.productName}
-      </Text>
-      <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
-      <View style={{ paddingTop: rh(2) }}>
-        <Pressable
-          onPress={() => {
-            onToggleAddToCart(item.id);
-          }}
-          style={({ pressed }) => [
-            {
-              borderRadius: 12,
-              backgroundColor: item?.inCart ? 'green' : 'purple',
-              paddingHorizontal: rw(8),
-              paddingVertical: rh(1.5),
-              opacity: pressed ? 0.5 : 1,
-              alignItems: 'center',
-            },
-          ]}
-        >
-          <Text
-            style={{
-              color: 'white',
-              fontFamily: 'Manrope',
-              fontWeight: 'bold',
+  }) => {
+    const isInCart = cartItems.some((cartItem) => cartItem.id === item.id);
+    return (
+      <Pressable
+        onPress={() => router.push('/(postAuth)/productDetails')}
+        style={{
+          backgroundColor: '#21262E',
+          maxWidth: '48%',
+          flex: 1,
+          paddingVertical: rh(3),
+          alignItems: 'center',
+          borderRadius: 20,
+          marginBottom: rh(2),
+        }}
+      >
+        <View>
+          <Image
+            source={{ uri: item.productImg }}
+            style={{ width: 150, height: 150, borderRadius: 20 }}
+            resizeMode='cover'
+          />
+          <Pressable
+            onPress={() => {
+              onToggleFavorite(item.id);
             }}
+            style={({ pressed }) => [
+              {
+                position: 'absolute',
+                backgroundColor: '#21262E',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: rw(2),
+                borderRadius: 10,
+                right: 5,
+                top: 5,
+                opacity: pressed ? 0.5 : 1,
+              },
+            ]}
           >
-            {item.inCart ? 'In Cart' : 'Move to Cart'}
-          </Text>
-        </Pressable>
-      </View>
-    </Pressable>
-  );
+            {item?.isFavorited ? (
+              <FontAwesome
+                name='heart'
+                size={15}
+                color='red'
+              />
+            ) : (
+              <FontAwesome
+                name='heart-o'
+                size={15}
+                color='white'
+              />
+            )}
+          </Pressable>
+        </View>
+        <Text style={{ color: 'white', marginTop: rh(1), fontWeight: '600' }}>
+          {item.productName}
+        </Text>
+        <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
+        <View style={{ paddingTop: rh(2) }}>
+          <Pressable
+            onPress={() => {
+              if (isInCart) {
+                removeFromCart(item.id);
+              } else {
+                addToCart({
+                  id: item.id,
+                  productImg: item.productImg,
+                  productName: item.productName,
+                  price: Number(item.price),
+                  itemCount: 1,
+                });
+              }
+            }}
+            style={({ pressed }) => [
+              {
+                borderRadius: 12,
+                backgroundColor: isInCart ? 'green' : 'purple',
+                paddingHorizontal: rw(8),
+                paddingVertical: rh(1.5),
+                opacity: pressed ? 0.5 : 1,
+                alignItems: 'center',
+              },
+            ]}
+          >
+            <Text
+              style={{
+                color: 'white',
+                fontFamily: 'Manrope',
+                fontWeight: 'bold',
+              }}
+            >
+              {isInCart ? 'In Cart' : 'Move to Cart'}
+            </Text>
+          </Pressable>
+        </View>
+      </Pressable>
+    );
+  };
 
   const toggleFavoriteForFeaturedProducts = (productId: string) => {
     setFeaturedProducts((preFeaturedProducts) => {
@@ -183,60 +196,6 @@ const Home = () => {
           return {
             ...product,
             isFavorited: !product.isFavorited,
-          };
-        }
-        return product;
-      });
-    });
-  };
-
-  const toggleAddToCartButtonForCuratedProducts = (productId: string) => {
-    setCuratedProducts((preCuratedProductsData) => {
-      return preCuratedProductsData.map((product) => {
-        if (product.id === productId) {
-          if (!product.inCart) {
-            addToCart({
-              id: product.id,
-              productImg: product.productImg,
-              productName: product.productName,
-              price: Number(product.price),
-              itemCount: 0,
-            });
-          }
-          if (product.inCart) {
-            removeFromCart(product.id);
-          }
-          return {
-            ...product,
-
-            inCart: !product.inCart,
-          };
-        }
-        return product;
-      });
-    });
-  };
-
-  const toggleAddToCartButtonForFeaturedProducts = (productId: string) => {
-    setFeaturedProducts((preFeaturedProducts) => {
-      return preFeaturedProducts.map((product) => {
-        if (product.id === productId) {
-          if (!product.inCart) {
-            addToCart({
-              id: product.id,
-              productImg: product.productImg,
-              productName: product.productName,
-              price: Number(product.price),
-              itemCount: 0,
-            });
-          }
-          if (product.inCart) {
-            removeFromCart(product.id);
-          }
-          return {
-            ...product,
-
-            inCart: !product.inCart,
           };
         }
         return product;
@@ -283,6 +242,8 @@ const Home = () => {
       <View style={{ paddingTop: rh(3) }}>
         <TextInput
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
           placeholder='Search for collections...'
           placeholderTextColor={'#7B8691'}
         />
@@ -338,7 +299,6 @@ const Home = () => {
           <ProductRenderItem
             item={item}
             onToggleFavorite={toggleFavoriteForFeaturedProducts}
-            onToggleAddToCart={toggleAddToCartButtonForFeaturedProducts}
           />
         )}
         keyExtractor={(item) => item.id}
@@ -379,7 +339,6 @@ const Home = () => {
             <ProductRenderItem
               item={item}
               onToggleFavorite={toggleFavoriteForCuratedProducts}
-              onToggleAddToCart={toggleAddToCartButtonForCuratedProducts}
             />
           )}
         />

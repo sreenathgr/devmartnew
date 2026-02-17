@@ -1,3 +1,4 @@
+import { useCartStore } from '@/hooks/useCart';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -33,6 +34,9 @@ type WishlistProductProps = {
 
 const Wishlist = () => {
   const insets = useSafeAreaInsets();
+  const cartItems = useCartStore((state) => state.cartItems);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
   const {
     userData,
     userDataLoading,
@@ -61,12 +65,11 @@ const Wishlist = () => {
   const RenderWishListItem = ({
     item,
     onToggleFavorite,
-    onToggleAddToCart,
   }: {
     item: WishlistProductProps;
     onToggleFavorite: (id: string) => void;
-    onToggleAddToCart: (id: string) => void;
   }) => {
+    const isInCart = cartItems.some((cartItem) => cartItem.id === item.id);
     return (
       <View
         style={{
@@ -125,12 +128,22 @@ const Wishlist = () => {
         <View style={{ paddingTop: rh(2) }}>
           <Pressable
             onPress={() => {
-              onToggleAddToCart(item.id);
+              if (isInCart) {
+                removeFromCart(item.id);
+              } else {
+                addToCart({
+                  id: item.id,
+                  productImg: item.productImg,
+                  productName: item.productName,
+                  price: Number(item.price),
+                  itemCount: 1,
+                });
+              }
             }}
             style={({ pressed }) => [
               {
                 borderRadius: 12,
-                backgroundColor: item?.inCart ? 'green' : 'purple',
+                backgroundColor: isInCart ? 'green' : 'purple',
                 paddingHorizontal: rw(8),
                 paddingVertical: rh(1.5),
                 opacity: pressed ? 0.5 : 1,
@@ -145,7 +158,7 @@ const Wishlist = () => {
                 fontWeight: 'bold',
               }}
             >
-              {item.inCart ? 'In Cart' : 'Move to Cart'}
+              {isInCart ? 'In Cart' : 'Move to Cart'}
             </Text>
           </Pressable>
         </View>
@@ -204,7 +217,6 @@ const Wishlist = () => {
           <RenderWishListItem
             item={item}
             onToggleFavorite={toggleFavorite}
-            onToggleAddToCart={toggleAddToCartButtonForWishlist}
           />
         )}
         keyExtractor={(item) => item.id}
