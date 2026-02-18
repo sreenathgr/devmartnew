@@ -10,7 +10,14 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
 import React from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -76,25 +83,28 @@ const Profile = () => {
                 </Text>
               </View>
               <View>
-                <View
-                  style={{
-                    backgroundColor: '#2d2d2d',
-                    width: 40,
-                    height: 40,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: rw(2),
-                    borderRadius: 30,
-                    borderWidth: StyleSheet.hairlineWidth,
-                    borderColor: 'white',
-                  }}
+                <Pressable
+                  style={({ pressed }) => [
+                    {
+                      backgroundColor: '#2d2d2d',
+                      width: 40,
+                      height: 40,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: rw(2),
+                      borderRadius: 30,
+                      borderWidth: StyleSheet.hairlineWidth,
+                      borderColor: 'white',
+                      opacity: pressed ? 0.5 : 1,
+                    },
+                  ]}
                 >
                   <Ionicons
                     name='pencil-sharp'
                     size={20}
                     color='white'
                   />
-                </View>
+                </Pressable>
               </View>
             </View>
             <View style={{ paddingTop: rh(3) }}>

@@ -25,6 +25,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+type ProductProps = {
+  id: string;
+  productImg: string;
+  productName: string;
+  price: string;
+  isFavorited: boolean;
+};
+
 type UserData = {
   uid: string;
   profileUrl: string;
@@ -34,14 +42,163 @@ type UserData = {
   curatedItems: ProductProps[];
 };
 
-type ProductProps = {
-  id: string;
-  productImg: string;
-  productName: string;
-  price: string;
-  isFavorited: boolean;
-  inCart: boolean;
-};
+const ProductRenderItem = ({
+  item,
+  onToggleFavorite,
+  onPress,
+  isInCart,
+  onCartPress,
+}: {
+  item: ProductProps;
+  onToggleFavorite: (id: string) => void;
+  onPress: () => void;
+  isInCart: boolean;
+  onCartPress: () => void;
+}) => (
+  <Pressable
+    onPress={onPress}
+    style={styles.productCard}
+  >
+    <View>
+      <Image
+        source={{ uri: item.productImg }}
+        style={styles.productImage}
+        resizeMode='cover'
+      />
+      <Pressable
+        onPress={() => onToggleFavorite(item.id)}
+        style={styles.favoriteBadge}
+      >
+        <FontAwesome
+          name={item.isFavorited ? 'heart' : 'heart-o'}
+          size={15}
+          color={item.isFavorited ? 'red' : 'white'}
+        />
+      </Pressable>
+    </View>
+    <Text style={styles.productNameText}>{item.productName}</Text>
+    <Text style={styles.productPriceText}>${item.price}</Text>
+    <View style={{ paddingTop: rh(2) }}>
+      <Pressable
+        onPress={onCartPress}
+        style={({ pressed }) => [
+          styles.cartButton,
+          {
+            backgroundColor: isInCart ? 'green' : 'purple',
+            opacity: pressed ? 0.5 : 1,
+          },
+        ]}
+      >
+        <Text style={styles.cartButtonText}>
+          {isInCart ? 'In Cart' : 'Move to Cart'}
+        </Text>
+      </Pressable>
+    </View>
+  </Pressable>
+);
+
+const FlatListHeader = ({
+  insets,
+  userData,
+  searchQuery,
+  handleSearch,
+  filteredFeaturedProducts,
+  onToggleFavorite,
+  onProductPress,
+  cartItems,
+  onCartAction,
+}: any) => (
+  <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
+    <View style={styles.headerTopRow}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <Image
+          source={{ uri: userData?.profileUrl }}
+          style={styles.profileImage}
+        />
+        <View style={{ paddingStart: rw(4), flex: 1 }}>
+          <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
+          <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+            {userData?.fullName || 'Guest'}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.iconContainer}>
+        <FontAwesome
+          name='bell'
+          size={18}
+          color='white'
+        />
+        <View style={styles.dot} />
+      </View>
+    </View>
+
+    <View style={{ paddingTop: rh(3) }}>
+      <TextInput
+        style={styles.searchInput}
+        value={searchQuery}
+        onChangeText={handleSearch}
+        placeholder='Search for collections...'
+        placeholderTextColor={'#7B8691'}
+      />
+      <Ionicons
+        name='search-sharp'
+        size={22}
+        color='#7B8691'
+        style={styles.searchIcon}
+      />
+      <MaterialIcons
+        name='tune'
+        size={22}
+        color='#7B8691'
+        style={styles.tuneIcon}
+      />
+    </View>
+
+    <View style={{ paddingTop: rh(3) }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      >
+        <HomeFilterButton label='All' />
+        <HomeFilterButton
+          marginStartFilterButton={rw(3)}
+          label={'Shoes'}
+        />
+        <HomeFilterButton
+          marginStartFilterButton={rw(3)}
+          label={'Apparel'}
+        />
+        <HomeFilterButton
+          marginStartFilterButton={rw(3)}
+          label={'Accessories'}
+        />
+      </ScrollView>
+    </View>
+
+    <View style={styles.titleSection}>
+      <Text style={styles.sectionTitle}>Featured Products</Text>
+      <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+    </View>
+
+    <View style={styles.featuredGrid}>
+      {filteredFeaturedProducts.map((item: ProductProps) => (
+        <ProductRenderItem
+          key={item.id}
+          item={item}
+          onToggleFavorite={onToggleFavorite}
+          onPress={onProductPress}
+          isInCart={cartItems.some((c: any) => c.id === item.id)}
+          onCartPress={() => onCartAction(item)}
+        />
+      ))}
+    </View>
+
+    <View style={styles.titleSection}>
+      <Text style={styles.sectionTitle}>Curated for you</Text>
+      <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+    </View>
+  </View>
+);
 
 const Home = () => {
   const insets = useSafeAreaInsets();
@@ -49,6 +206,7 @@ const Home = () => {
   const cartItems = useCartStore((state) => state.cartItems);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
+
   const {
     userData,
     userDataLoading,
@@ -57,260 +215,84 @@ const Home = () => {
   const { data, loading: productsLoading } = useFetch<ProductProps[]>({
     url: `${AppConstants.API_BASE_URL}/shopease/products`,
   });
+
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [FeaturedProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
+  const [filteredFeaturedProducts, setFilteredFeaturedProducts] = useState<
+    ProductProps[]
+  >([]);
   const [curatedProducts, setCuratedProducts] = useState<ProductProps[]>([]);
+
   const isAppLoading = userDataLoading || productsLoading;
 
   useEffect(() => {
     setFeaturedProducts(data || []);
+    setFilteredFeaturedProducts(data || []);
   }, [data]);
 
   useEffect(() => {
     setCuratedProducts(userData?.curatedItems || []);
   }, [userData]);
 
-  const ProductRenderItem = ({
-    item,
-    onToggleFavorite,
-  }: {
-    item: ProductProps;
-    onToggleFavorite: (id: string) => void;
-  }) => {
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    if (text.trim() === '') {
+      setFilteredFeaturedProducts(featuredProducts);
+    } else {
+      const lowerCaseQuery = text.toLowerCase();
+      const filtered = featuredProducts.filter((p) =>
+        p.productName.toLowerCase().includes(lowerCaseQuery),
+      );
+      setFilteredFeaturedProducts(filtered);
+    }
+  };
+
+  const handleCartAction = (item: ProductProps) => {
     const isInCart = cartItems.some((cartItem) => cartItem.id === item.id);
-    return (
-      <Pressable
-        onPress={() => router.push('/(postAuth)/productDetails')}
-        style={{
-          backgroundColor: '#21262E',
-          maxWidth: '48%',
-          flex: 1,
-          paddingVertical: rh(3),
-          alignItems: 'center',
-          borderRadius: 20,
-          marginBottom: rh(2),
-        }}
-      >
-        <View>
-          <Image
-            source={{ uri: item.productImg }}
-            style={{ width: 150, height: 150, borderRadius: 20 }}
-            resizeMode='cover'
-          />
-          <Pressable
-            onPress={() => {
-              onToggleFavorite(item.id);
-            }}
-            style={({ pressed }) => [
-              {
-                position: 'absolute',
-                backgroundColor: '#21262E',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: rw(2),
-                borderRadius: 10,
-                right: 5,
-                top: 5,
-                opacity: pressed ? 0.5 : 1,
-              },
-            ]}
-          >
-            {item?.isFavorited ? (
-              <FontAwesome
-                name='heart'
-                size={15}
-                color='red'
-              />
-            ) : (
-              <FontAwesome
-                name='heart-o'
-                size={15}
-                color='white'
-              />
-            )}
-          </Pressable>
-        </View>
-        <Text style={{ color: 'white', marginTop: rh(1), fontWeight: '600' }}>
-          {item.productName}
-        </Text>
-        <Text style={{ color: 'lightblue', marginTop: 4 }}>${item.price}</Text>
-        <View style={{ paddingTop: rh(2) }}>
-          <Pressable
-            onPress={() => {
-              if (isInCart) {
-                removeFromCart(item.id);
-              } else {
-                addToCart({
-                  id: item.id,
-                  productImg: item.productImg,
-                  productName: item.productName,
-                  price: Number(item.price),
-                  itemCount: 1,
-                });
-              }
-            }}
-            style={({ pressed }) => [
-              {
-                borderRadius: 12,
-                backgroundColor: isInCart ? 'green' : 'purple',
-                paddingHorizontal: rw(8),
-                paddingVertical: rh(1.5),
-                opacity: pressed ? 0.5 : 1,
-                alignItems: 'center',
-              },
-            ]}
-          >
-            <Text
-              style={{
-                color: 'white',
-                fontFamily: 'Manrope',
-                fontWeight: 'bold',
-              }}
-            >
-              {isInCart ? 'In Cart' : 'Move to Cart'}
-            </Text>
-          </Pressable>
-        </View>
-      </Pressable>
+    if (isInCart) {
+      removeFromCart(item.id);
+    } else {
+      addToCart({
+        id: item.id,
+        productImg: item.productImg,
+        productName: item.productName,
+        price: Number(item.price),
+        itemCount: 1,
+      });
+    }
+  };
+
+  const toggleFavoriteFeatured = (productId: string) => {
+    setFeaturedProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
+      ),
+    );
+    setFilteredFeaturedProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
+      ),
     );
   };
 
-  const toggleFavoriteForFeaturedProducts = (productId: string) => {
-    setFeaturedProducts((preFeaturedProducts) => {
-      return preFeaturedProducts.map((product) => {
-        if (product.id === productId) {
-          return {
-            ...product,
-            isFavorited: !product.isFavorited,
-          };
-        }
-        return product;
-      });
-    });
+  const toggleFavoriteCurated = (productId: string) => {
+    setCuratedProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
+      ),
+    );
   };
 
-  const toggleFavoriteForCuratedProducts = (productId: string) => {
-    setCuratedProducts((preCuratedProductsData) => {
-      return preCuratedProductsData.map((product) => {
-        if (product.id === productId) {
-          return {
-            ...product,
-            isFavorited: !product.isFavorited,
-          };
-        }
-        return product;
-      });
-    });
-  };
-
-  const FlatListHeader = () => (
-    <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <Image
-            source={{ uri: userData?.profileUrl }}
-            style={{
-              width: 45,
-              height: 45,
-              borderRadius: 22.5,
-              backgroundColor: '#333',
-            }}
-          />
-          <View style={{ paddingStart: rw(4), flex: 1 }}>
-            <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
-            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
-              {userData?.fullName || 'Guest'}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.iconContainer}>
-          <FontAwesome
-            name='bell'
-            size={18}
-            color='white'
-          />
-          <View style={styles.dot} />
-        </View>
-      </View>
-
-      <View style={{ paddingTop: rh(3) }}>
-        <TextInput
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
-          placeholder='Search for collections...'
-          placeholderTextColor={'#7B8691'}
-        />
-
-        <Ionicons
-          name='search-sharp'
-          size={22}
-          color='#7B8691'
-          style={styles.searchIcon}
-        />
-
-        <MaterialIcons
-          name='tune'
-          size={22}
-          color='#7B8691'
-          style={styles.tuneIcon}
+  if (isAppLoading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator
+          size='large'
+          color={Colors.acccentBlue}
         />
       </View>
-
-      <View style={{ paddingTop: rh(3) }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          <HomeFilterButton label='All' />
-          <HomeFilterButton
-            marginStartFilterButton={rw(3)}
-            label={'Shoes'}
-          />
-          <HomeFilterButton
-            marginStartFilterButton={rw(3)}
-            label={'Apparel'}
-          />
-          <HomeFilterButton
-            marginStartFilterButton={rw(3)}
-            label={'Accessories'}
-          />
-        </ScrollView>
-      </View>
-      <View style={styles.titleSection}>
-        <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
-          Featured Products
-        </Text>
-        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
-      </View>
-      <FlatList
-        numColumns={2}
-        data={FeaturedProducts}
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: rh(5) }}
-        columnWrapperStyle={{ gap: rw(4) }}
-        renderItem={({ item }) => (
-          <ProductRenderItem
-            item={item}
-            onToggleFavorite={toggleFavoriteForFeaturedProducts}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-      />
-      <View style={styles.titleSection}>
-        <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
-          Curated for you
-        </Text>
-        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
-      </View>
-    </View>
-  );
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -319,30 +301,36 @@ const Home = () => {
         style={StyleSheet.absoluteFill}
       />
 
-      {isAppLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator
-            size='large'
-            color={Colors.acccentBlue}
+      <FlatList
+        data={curatedProducts}
+        numColumns={2}
+        keyExtractor={(item) => `curated-${item.id}`}
+        ListHeaderComponent={
+          <FlatListHeader
+            insets={insets}
+            userData={userData}
+            searchQuery={searchQuery}
+            handleSearch={handleSearch}
+            filteredFeaturedProducts={filteredFeaturedProducts}
+            onToggleFavorite={toggleFavoriteFeatured}
+            onProductPress={() => router.push('/(postAuth)/productDetails')}
+            cartItems={cartItems}
+            onCartAction={handleCartAction}
           />
-        </View>
-      ) : (
-        <FlatList
-          data={curatedProducts}
-          numColumns={2}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={FlatListHeader}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: rh(5) }}
-          columnWrapperStyle={{ paddingHorizontal: rw(4), gap: rw(4) }}
-          renderItem={({ item }) => (
-            <ProductRenderItem
-              item={item}
-              onToggleFavorite={toggleFavoriteForCuratedProducts}
-            />
-          )}
-        />
-      )}
+        }
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: rh(5) }}
+        columnWrapperStyle={{ paddingHorizontal: rw(4), gap: rw(4) }}
+        renderItem={({ item }) => (
+          <ProductRenderItem
+            item={item}
+            onToggleFavorite={toggleFavoriteCurated}
+            onPress={() => router.push('/(postAuth)/productDetails')}
+            isInCart={cartItems.some((c) => c.id === item.id)}
+            onCartPress={() => handleCartAction(item)}
+          />
+        )}
+      />
     </View>
   );
 };
@@ -354,6 +342,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#0B0E14',
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: '#333',
   },
   iconContainer: {
     backgroundColor: '#21262E',
@@ -381,16 +381,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: rw(12),
     borderRadius: 18,
   },
-  searchIcon: {
-    position: 'absolute',
-    top: rh(5),
-    left: 15,
-  },
-  tuneIcon: {
-    position: 'absolute',
-    top: rh(5),
-    right: 15,
-  },
+  searchIcon: { position: 'absolute', top: rh(5), left: 15 },
+  tuneIcon: { position: 'absolute', top: rh(5), right: 15 },
   titleSection: {
     paddingTop: rh(4),
     paddingBottom: rh(2),
@@ -398,4 +390,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  sectionTitle: { color: 'white', fontSize: 20, fontWeight: '500' },
+  featuredGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  productCard: {
+    backgroundColor: '#21262E',
+    width: '48%',
+    paddingVertical: rh(3),
+    alignItems: 'center',
+    borderRadius: 20,
+    marginBottom: rh(2),
+  },
+  productImage: { width: 140, height: 140, borderRadius: 20 },
+  favoriteBadge: {
+    position: 'absolute',
+    backgroundColor: '#21262E',
+    padding: rw(2),
+    borderRadius: 10,
+    right: 5,
+    top: 5,
+  },
+  productNameText: { color: 'white', marginTop: rh(1), fontWeight: '600' },
+  productPriceText: { color: 'lightblue', marginTop: 4 },
+  cartButton: {
+    borderRadius: 12,
+    paddingHorizontal: rw(5),
+    paddingVertical: rh(1.5),
+    alignItems: 'center',
+  },
+  cartButtonText: { color: 'white', fontWeight: 'bold' },
 });
