@@ -1,11 +1,12 @@
 import { Colors } from '@/constants/Colors';
 import { useCartStore } from '@/hooks/useCart';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
+import useWishListStore from '@/hooks/useWishlist';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -35,6 +36,7 @@ type WishlistProductProps = {
 
 const WishListHeader = ({ userData }: { userData: UserData | null }) => {
   const insets = useSafeAreaInsets();
+  const wishListItems = useWishListStore((state) => state.wishListItems);
   return (
     <View style={{ paddingHorizontal: rw(5), paddingBottom: rh(2) }}>
       <View style={{ paddingTop: insets.top }}>
@@ -51,24 +53,25 @@ const WishListHeader = ({ userData }: { userData: UserData | null }) => {
       </View>
       <View style={{ paddingTop: rh(1) }}>
         <Text style={{ color: 'skyblue', fontSize: 18 }}>
-          {userData?.wishlist?.length} ITEMS
+          {wishListItems.length} ITEMS
         </Text>
       </View>
     </View>
   );
 };
 
-const RenderWishListItem = ({
-  item,
-  onToggleFavorite,
-}: {
-  item: WishlistProductProps;
-  onToggleFavorite: (id: string) => void;
-}) => {
+const RenderWishListItem = ({ item }: { item: WishlistProductProps }) => {
   const cartItems = useCartStore((state) => state.cartItems);
+
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const isInCart = cartItems.some((cartItem) => cartItem.id === item.id);
+
+  const onToggleFavorite = useWishListStore((state) => state.toggleFavorite);
+  const removeItemFromWishList = useWishListStore(
+    (state) => state.removeItemFromWishList,
+  );
+
   return (
     <View
       style={{
@@ -89,7 +92,8 @@ const RenderWishListItem = ({
         />
         <Pressable
           onPress={() => {
-            onToggleFavorite(item.id);
+            //onToggleFavorite(item.id);
+            removeItemFromWishList(item.id);
           }}
           style={({ pressed }) => [
             {
@@ -171,24 +175,18 @@ const Wishlist = () => {
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
-  const [wishListData, setWishListData] = useState<WishlistProductProps[]>([]);
+  const wishListItems = useWishListStore((state) => state.wishListItems);
+  const addItemToWishList = useWishListStore(
+    (state) => state.addItemToWishList,
+  );
 
   useEffect(() => {
     if (userData) {
-      setWishListData(userData?.wishlist || []);
+      userData?.wishlist?.forEach((item) => {
+        addItemToWishList(item);
+      });
     }
   }, [userData]);
-
-  const toggleFavorite = (productId: string) => {
-    setWishListData((prevWishListData) => {
-      return prevWishListData.map((product) => {
-        if (product.id === productId) {
-          return { ...product, isFavorited: !product.isFavorited };
-        }
-        return product;
-      });
-    });
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -207,15 +205,10 @@ const Wishlist = () => {
         <FlatList
           ListHeaderComponent={<WishListHeader userData={userData} />}
           numColumns={2}
-          data={wishListData}
+          data={wishListItems}
           contentContainerStyle={{ paddingBottom: rh(5) }}
           columnWrapperStyle={{ paddingHorizontal: rw(4), gap: rw(4) }}
-          renderItem={({ item }) => (
-            <RenderWishListItem
-              item={item}
-              onToggleFavorite={toggleFavorite}
-            />
-          )}
+          renderItem={({ item }) => <RenderWishListItem item={item} />}
           keyExtractor={(item) => item.id}
         />
       )}

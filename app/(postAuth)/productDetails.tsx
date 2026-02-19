@@ -1,10 +1,16 @@
-import { rw } from '@/utils/responsiveScreenMeasures';
+import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import PagerView from 'react-native-pager-view';
 import Animated, {
   useAnimatedStyle,
@@ -18,7 +24,7 @@ const ProductDetails = () => {
   const router = useRouter();
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
-
+  const [isFavorited, setIsFavorited] = useState(false);
   const dot1Width = useSharedValue(10);
   const dot2Width = useSharedValue(10);
   const dot3Width = useSharedValue(10);
@@ -52,7 +58,7 @@ const ProductDetails = () => {
       />
       <View>
         <PagerView
-          style={{ width: '100%', height: '80%' }}
+          style={{ width: '100%', height: rh(50) }}
           initialPage={0}
           onPageSelected={onPageSelected}
           ref={pagerRef}
@@ -85,33 +91,58 @@ const ProductDetails = () => {
             justifyContent: 'space-between',
           }}
         >
-          <View style={styles.iconContainer}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.iconContainer,
+              { opacity: pressed ? 0.5 : 1 },
+            ]}
+          >
             <FontAwesome
               name='chevron-left'
               size={18}
               color='white'
             />
-          </View>
+          </Pressable>
           <View style={{ flexDirection: 'row' }}>
-            <View style={styles.iconContainer}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.iconContainer,
+                { opacity: pressed ? 0.5 : 1 },
+              ]}
+            >
               <Entypo
                 name='share'
                 size={24}
                 color='white'
               />
-            </View>
+            </Pressable>
             <View style={{ paddingStart: rw(5) }}>
-              <View style={styles.iconContainer}>
-                <Entypo
-                  name='heart'
-                  size={24}
-                  color='red'
-                />
-              </View>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.iconContainer,
+                  { opacity: pressed ? 0.5 : 1 },
+                ]}
+                onPress={() => setIsFavorited((prev) => !prev)}
+              >
+                {isFavorited ? (
+                  <Entypo
+                    name='heart'
+                    size={24}
+                    color='red'
+                  />
+                ) : (
+                  <Entypo
+                    name='heart-outlined'
+                    size={24}
+                    color='red'
+                  />
+                )}
+              </Pressable>
             </View>
           </View>
         </View>
-        <View style={{ position: 'absolute', bottom: 200, left: 170 }}>
+        <View style={{ position: 'absolute', bottom: 50, left: 170 }}>
           <View style={{ flexDirection: 'row' }}>
             <Animated.View
               style={[
@@ -145,6 +176,31 @@ const ProductDetails = () => {
               ]}
             />
           </View>
+        </View>
+      </View>
+      <View style={{ paddingHorizontal: rw(5) }}>
+        <View style={{ paddingTop: rh(2) }}>
+          <Text style={{ color: 'white', fontSize: 28 }}>Headphones</Text>
+        </View>
+        <View>
+          <Text style={{ color: 'white', fontSize: 28 }}>$85.00</Text>
+        </View>
+        <View>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 18,
+              fontFamily: 'Manrope',
+              fontStyle: 'italic',
+            }}
+          >
+            Experience immersive high-fidelity sound with these premium over-ear
+            headphones. Featuring advanced noise-cancellation technology, plush
+            memory foam ear cushions, and a sleek, ergonomic design, they
+            provide unparalleled comfort for all-day listening. With a 40-hour
+            battery life and intuitive touch controls, enjoy crystal-clear audio
+            and seamless connectivity wherever your music takes you.
+          </Text>
         </View>
       </View>
     </View>

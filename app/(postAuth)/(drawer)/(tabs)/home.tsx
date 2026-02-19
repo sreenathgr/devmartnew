@@ -4,6 +4,7 @@ import { Colors } from '@/constants/Colors';
 import { useCartStore } from '@/hooks/useCart';
 import useFetch from '@/hooks/useFetch';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
+import useWishListStore from '@/hooks/useWishlist';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -47,12 +48,16 @@ const ProductRenderItem = ({
   onToggleFavorite,
   onPress,
   isInCart,
+  isInWishList,
+  addItemToWishList,
   onCartPress,
 }: {
   item: ProductProps;
-  onToggleFavorite: (id: string) => void;
+  onToggleFavorite: (productId: string) => void;
   onPress: () => void;
   isInCart: boolean;
+  isInWishList: boolean;
+  addItemToWishList: (item: ProductProps) => void;
   onCartPress: () => void;
 }) => (
   <Pressable
@@ -66,13 +71,15 @@ const ProductRenderItem = ({
         resizeMode='cover'
       />
       <Pressable
-        onPress={() => onToggleFavorite(item.id)}
+        onPress={() => {
+          onToggleFavorite(item.id);
+        }}
         style={styles.favoriteBadge}
       >
         <FontAwesome
-          name={item.isFavorited ? 'heart' : 'heart-o'}
+          name={isInWishList ? 'heart' : 'heart-o'}
           size={15}
-          color={item.isFavorited ? 'red' : 'white'}
+          color={isInWishList ? 'red' : 'white'}
         />
       </Pressable>
     </View>
@@ -106,7 +113,9 @@ const FlatListHeader = ({
   onToggleFavorite,
   onProductPress,
   cartItems,
+  wishListItems,
   onCartAction,
+  addItemToWishList,
 }: any) => (
   <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
     <View style={styles.headerTopRow}>
@@ -188,6 +197,8 @@ const FlatListHeader = ({
           onToggleFavorite={onToggleFavorite}
           onPress={onProductPress}
           isInCart={cartItems.some((c: any) => c.id === item.id)}
+          isInWishList={wishListItems.some((w: any) => w.id === item.id)}
+          addItemToWishList={addItemToWishList}
           onCartPress={() => onCartAction(item)}
         />
       ))}
@@ -204,8 +215,12 @@ const Home = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const cartItems = useCartStore((state) => state.cartItems);
+  const wishListItems = useWishListStore((state) => state.wishListItems);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const addItemToWishList = useWishListStore(
+    (state) => state.addItemToWishList,
+  );
 
   const {
     userData,
@@ -263,24 +278,27 @@ const Home = () => {
   };
 
   const toggleFavoriteFeatured = (productId: string) => {
-    setFeaturedProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
-      ),
-    );
-    setFilteredFeaturedProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
-      ),
-    );
+    const isInWishList = wishListItems.some((w) => w.id === productId);
+    if (isInWishList) {
+      useWishListStore.getState().removeItemFromWishList(productId);
+    } else {
+      const product = featuredProducts.find((p) => p.id === productId);
+      if (product) {
+        useWishListStore.getState().addItemToWishList(product);
+      }
+    }
   };
 
   const toggleFavoriteCurated = (productId: string) => {
-    setCuratedProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, isFavorited: !p.isFavorited } : p,
-      ),
-    );
+    const isInWishList = wishListItems.some((w) => w.id === productId);
+    if (isInWishList) {
+      useWishListStore.getState().removeItemFromWishList(productId);
+    } else {
+      const product = curatedProducts.find((p) => p.id === productId);
+      if (product) {
+        useWishListStore.getState().addItemToWishList(product);
+      }
+    }
   };
 
   if (isAppLoading) {
@@ -315,7 +333,9 @@ const Home = () => {
             onToggleFavorite={toggleFavoriteFeatured}
             onProductPress={() => router.push('/(postAuth)/productDetails')}
             cartItems={cartItems}
+            wishListItems={wishListItems}
             onCartAction={handleCartAction}
+            addItemToWishList={addItemToWishList}
           />
         }
         style={{ flex: 1 }}
@@ -327,6 +347,8 @@ const Home = () => {
             onToggleFavorite={toggleFavoriteCurated}
             onPress={() => router.push('/(postAuth)/productDetails')}
             isInCart={cartItems.some((c) => c.id === item.id)}
+            isInWishList={wishListItems.some((w) => w.id === item.id)}
+            addItemToWishList={addItemToWishList}
             onCartPress={() => handleCartAction(item)}
           />
         )}
