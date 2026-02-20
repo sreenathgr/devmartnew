@@ -111,105 +111,112 @@ const FlatListHeader = ({
   handleSearch,
   filteredFeaturedProducts,
   onToggleFavorite,
-  onProductPress,
   cartItems,
   wishListItems,
   onCartAction,
   addItemToWishList,
-}: any) => (
-  <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
-    <View style={styles.headerTopRow}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-        <Image
-          source={{ uri: userData?.profileUrl }}
-          style={styles.profileImage}
-        />
-        <View style={{ paddingStart: rw(4), flex: 1 }}>
-          <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
-          <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
-            {userData?.fullName || 'Guest'}
-          </Text>
+}: any) => {
+  const router = useRouter();
+  return (
+    <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
+      <View style={styles.headerTopRow}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Image
+            source={{ uri: userData?.profileUrl }}
+            style={styles.profileImage}
+          />
+          <View style={{ paddingStart: rw(4), flex: 1 }}>
+            <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+              {userData?.fullName || 'Guest'}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.iconContainer}>
+          <FontAwesome
+            name='bell'
+            size={18}
+            color='white'
+          />
+          <View style={styles.dot} />
         </View>
       </View>
-      <View style={styles.iconContainer}>
-        <FontAwesome
-          name='bell'
-          size={18}
-          color='white'
+
+      <View style={{ paddingTop: rh(3) }}>
+        <TextInput
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={handleSearch}
+          placeholder='Search for Featured Products...'
+          placeholderTextColor={'#7B8691'}
         />
-        <View style={styles.dot} />
+        <Ionicons
+          name='search-sharp'
+          size={22}
+          color='#7B8691'
+          style={styles.searchIcon}
+        />
+        <MaterialIcons
+          name='tune'
+          size={22}
+          color='#7B8691'
+          style={styles.tuneIcon}
+        />
+      </View>
+
+      <View style={{ paddingTop: rh(3) }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <HomeFilterButton label='All' />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Shoes'}
+          />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Apparel'}
+          />
+          <HomeFilterButton
+            marginStartFilterButton={rw(3)}
+            label={'Accessories'}
+          />
+        </ScrollView>
+      </View>
+
+      <View style={styles.titleSection}>
+        <Text style={styles.sectionTitle}>Featured Products</Text>
+        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+      </View>
+
+      <View style={styles.featuredGrid}>
+        {filteredFeaturedProducts.map((item: ProductProps) => (
+          <ProductRenderItem
+            key={item.id}
+            item={item}
+            onToggleFavorite={onToggleFavorite}
+            onPress={() => {
+              router.push({
+                pathname: '/(postAuth)/productDetails',
+                params: { productDetails: JSON.stringify(item) },
+              });
+            }}
+            isInCart={cartItems.some((c: any) => c.id === item.id)}
+            isInWishList={wishListItems.some((w: any) => w.id === item.id)}
+            addItemToWishList={addItemToWishList}
+            onCartPress={() => onCartAction(item)}
+          />
+        ))}
+      </View>
+
+      <View style={styles.titleSection}>
+        <Text style={styles.sectionTitle}>Curated for you</Text>
+        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
       </View>
     </View>
-
-    <View style={{ paddingTop: rh(3) }}>
-      <TextInput
-        style={styles.searchInput}
-        value={searchQuery}
-        onChangeText={handleSearch}
-        placeholder='Search for collections...'
-        placeholderTextColor={'#7B8691'}
-      />
-      <Ionicons
-        name='search-sharp'
-        size={22}
-        color='#7B8691'
-        style={styles.searchIcon}
-      />
-      <MaterialIcons
-        name='tune'
-        size={22}
-        color='#7B8691'
-        style={styles.tuneIcon}
-      />
-    </View>
-
-    <View style={{ paddingTop: rh(3) }}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        <HomeFilterButton label='All' />
-        <HomeFilterButton
-          marginStartFilterButton={rw(3)}
-          label={'Shoes'}
-        />
-        <HomeFilterButton
-          marginStartFilterButton={rw(3)}
-          label={'Apparel'}
-        />
-        <HomeFilterButton
-          marginStartFilterButton={rw(3)}
-          label={'Accessories'}
-        />
-      </ScrollView>
-    </View>
-
-    <View style={styles.titleSection}>
-      <Text style={styles.sectionTitle}>Featured Products</Text>
-      <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
-    </View>
-
-    <View style={styles.featuredGrid}>
-      {filteredFeaturedProducts.map((item: ProductProps) => (
-        <ProductRenderItem
-          key={item.id}
-          item={item}
-          onToggleFavorite={onToggleFavorite}
-          onPress={onProductPress}
-          isInCart={cartItems.some((c: any) => c.id === item.id)}
-          isInWishList={wishListItems.some((w: any) => w.id === item.id)}
-          addItemToWishList={addItemToWishList}
-          onCartPress={() => onCartAction(item)}
-        />
-      ))}
-    </View>
-
-    <View style={styles.titleSection}>
-      <Text style={styles.sectionTitle}>Curated for you</Text>
-      <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
-    </View>
-  </View>
-);
+  );
+};
 
 const Home = () => {
   const insets = useSafeAreaInsets();
@@ -331,7 +338,6 @@ const Home = () => {
             handleSearch={handleSearch}
             filteredFeaturedProducts={filteredFeaturedProducts}
             onToggleFavorite={toggleFavoriteFeatured}
-            onProductPress={() => router.push('/(postAuth)/productDetails')}
             cartItems={cartItems}
             wishListItems={wishListItems}
             onCartAction={handleCartAction}
@@ -345,7 +351,12 @@ const Home = () => {
           <ProductRenderItem
             item={item}
             onToggleFavorite={toggleFavoriteCurated}
-            onPress={() => router.push('/(postAuth)/productDetails')}
+            onPress={() => {
+              router.push({
+                pathname: '/(postAuth)/productDetails',
+                params: { productDetails: JSON.stringify(item) },
+              });
+            }}
             isInCart={cartItems.some((c) => c.id === item.id)}
             isInWishList={wishListItems.some((w) => w.id === item.id)}
             addItemToWishList={addItemToWishList}

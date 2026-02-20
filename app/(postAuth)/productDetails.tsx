@@ -1,12 +1,17 @@
+import { useCartStore } from '@/hooks/useCart';
+import useWishListStore from '@/hooks/useWishlist';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ImageBackground,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -19,12 +24,30 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+type ProductProps = {
+  id: string;
+  productImg: string;
+  productName: string;
+  price: string;
+  isFavorited: boolean;
+  description: string;
+};
+
 const ProductDetails = () => {
   const insets = useSafeAreaInsets();
+
   const router = useRouter();
+  const { productDetails } = useLocalSearchParams();
+  const itemString = Array.isArray(productDetails)
+    ? productDetails[0]
+    : productDetails;
+  const data: ProductProps = itemString ? JSON.parse(itemString) : {};
+  const wishListItems = useWishListStore((state) => state.wishListItems);
+  const isInWishList = wishListItems.some((item) => item.id === data.id);
+  const cartItems = useCartStore((state) => state.cartItems);
+  const isInCart = cartItems.some((item) => item.id === data.id);
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [isFavorited, setIsFavorited] = useState(false);
   const dot1Width = useSharedValue(10);
   const dot2Width = useSharedValue(10);
   const dot3Width = useSharedValue(10);
@@ -51,7 +74,10 @@ const ProductDetails = () => {
     dot3Width.value = withSpring(currentPage === 2 ? 30 : 10);
   }, [currentPage]);
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom }}
+    >
       <LinearGradient
         colors={['#1e1b4b', '#0B0E14']}
         style={StyleSheet.absoluteFill}
@@ -105,7 +131,7 @@ const ProductDetails = () => {
             />
           </Pressable>
           <View style={{ flexDirection: 'row' }}>
-            <Pressable
+            {/* <Pressable
               style={({ pressed }) => [
                 styles.iconContainer,
                 { opacity: pressed ? 0.5 : 1 },
@@ -116,16 +142,22 @@ const ProductDetails = () => {
                 size={24}
                 color='white'
               />
-            </Pressable>
+            </Pressable> */}
             <View style={{ paddingStart: rw(5) }}>
               <Pressable
                 style={({ pressed }) => [
                   styles.iconContainer,
                   { opacity: pressed ? 0.5 : 1 },
                 ]}
-                onPress={() => setIsFavorited((prev) => !prev)}
+                onPress={() => {
+                  if (isInWishList) {
+                    useWishListStore.getState().removeItemFromWishList(data.id);
+                  } else {
+                    useWishListStore.getState().addItemToWishList(data);
+                  }
+                }}
               >
-                {isFavorited ? (
+                {isInWishList ? (
                   <Entypo
                     name='heart'
                     size={24}
@@ -180,12 +212,14 @@ const ProductDetails = () => {
       </View>
       <View style={{ paddingHorizontal: rw(5) }}>
         <View style={{ paddingTop: rh(2) }}>
-          <Text style={{ color: 'white', fontSize: 28 }}>Headphones</Text>
+          <Text style={{ color: 'white', fontSize: 28 }}>
+            {data.productName}
+          </Text>
         </View>
         <View>
-          <Text style={{ color: 'white', fontSize: 28 }}>$85.00</Text>
+          <Text style={{ color: 'white', fontSize: 28 }}>${data.price}</Text>
         </View>
-        <View>
+        <View style={{ paddingTop: rh(2) }}>
           <Text
             style={{
               color: 'white',
@@ -194,16 +228,76 @@ const ProductDetails = () => {
               fontStyle: 'italic',
             }}
           >
-            Experience immersive high-fidelity sound with these premium over-ear
-            headphones. Featuring advanced noise-cancellation technology, plush
-            memory foam ear cushions, and a sleek, ergonomic design, they
-            provide unparalleled comfort for all-day listening. With a 40-hour
-            battery life and intuitive touch controls, enjoy crystal-clear audio
-            and seamless connectivity wherever your music takes you.
+            {data.description}
           </Text>
         </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: rw(5),
+            justifyContent: 'space-around',
+          }}
+        >
+          <Pressable
+            onPress={() => {
+              if (isInCart) {
+                useCartStore.getState().removeFromCart(data.id);
+              } else {
+                useCartStore.getState().addToCart({
+                  id: data.id,
+                  price: Number(data.price),
+                  productImg: data.productImg,
+                  productName: data.productName,
+                  itemCount: 1,
+                });
+              }
+            }}
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                backgroundColor: isInCart ? 'green' : 'purple',
+                alignItems: 'center',
+                padding: rw(3),
+                borderRadius: 15,
+                opacity: pressed ? 0.5 : 1,
+              },
+            ]}
+          >
+            <Ionicons
+              name='cart'
+              size={24}
+              color='white'
+            />
+            <View style={{ paddingStart: rw(2) }}>
+              <Text style={{ color: 'white' }}>
+                {isInCart ? 'IN CART' : 'ADD TO CART'}
+              </Text>
+            </View>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                backgroundColor: 'white',
+                alignItems: 'center',
+                padding: rw(3),
+                borderRadius: 15,
+                opacity: pressed ? 0.5 : 1,
+              },
+            ]}
+          >
+            <AntDesign
+              name='thunderbolt'
+              size={15}
+              color='black'
+            />
+            <View style={{ paddingStart: rw(2) }}>
+              <Text style={{ color: 'black' }}>BUY NOW</Text>
+            </View>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
