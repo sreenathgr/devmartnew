@@ -2,6 +2,7 @@ import { useCartStore } from '@/hooks/useCart';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Router, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
   FlatList,
@@ -26,6 +27,7 @@ const CartListHeaderComponent = () => {
   const clearCart = useCartStore((state) => state.clearCart);
   const cartListData = useCartStore((state) => state.cartItems);
   const insets = useSafeAreaInsets();
+
   return (
     <View style={{ paddingBottom: rh(3) }}>
       <View
@@ -70,8 +72,10 @@ const CartListHeaderComponent = () => {
 
 const CartListFooterComponent = ({
   cartItemTotal,
+  router,
 }: {
   cartItemTotal: number;
+  router: Router;
 }) => {
   const cartListData = useCartStore((state) => state.cartItems);
   return (
@@ -164,6 +168,9 @@ const CartListFooterComponent = ({
             </View>
             <View style={{ paddingTop: rh(3) }}>
               <Pressable
+                onPress={() => {
+                  router.push('/(postAuth)/checkout');
+                }}
                 style={({ pressed }) => [
                   {
                     backgroundColor: 'white',
@@ -204,6 +211,7 @@ const CartListFooterComponent = ({
 };
 
 const Cart = () => {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const cartListData = useCartStore((state) => state.cartItems);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
@@ -315,7 +323,10 @@ const Cart = () => {
           renderItem={cartItemsRenderItem}
           ListHeaderComponent={CartListHeaderComponent}
           ListFooterComponent={
-            <CartListFooterComponent cartItemTotal={cartItemTotal} />
+            <CartListFooterComponent
+              cartItemTotal={cartItemTotal}
+              router={router}
+            />
           }
           keyExtractor={(item: cartItemsType) => item.id}
         />
