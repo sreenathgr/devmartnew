@@ -169,7 +169,10 @@ const CartListFooterComponent = ({
             <View style={{ paddingTop: rh(3) }}>
               <Pressable
                 onPress={() => {
-                  router.push('/(postAuth)/checkout');
+                  router.push({
+                    pathname: '/(postAuth)/checkout',
+                    params: { cartItemTotal: cartItemTotal },
+                  });
                 }}
                 style={({ pressed }) => [
                   {

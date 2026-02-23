@@ -5,9 +5,10 @@ import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
+
 import {
   ActivityIndicator,
   Pressable,
@@ -40,6 +41,7 @@ type UserData = {
 const Checkout = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { cartItemTotal } = useLocalSearchParams();
   const [isConfirmationModalVisible, setConfirmationModalVisibile] =
     useState<boolean>(false);
   const [selectedMethod, setSelectedMethod] = useState<string>('card');
@@ -48,7 +50,7 @@ const Checkout = () => {
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
-
+  const totalAmount = Number(cartItemTotal) + 9;
   return (
     <>
       <LinearGradient
@@ -384,7 +386,9 @@ const Checkout = () => {
                 <Text style={{ color: '#7B8691', fontSize: 15 }}>Subtotal</Text>
               </View>
               <View>
-                <Text style={{ color: 'white', fontSize: 15 }}>$1,240.00</Text>
+                <Text style={{ color: 'white', fontSize: 15 }}>
+                  ${cartItemTotal}
+                </Text>
               </View>
             </View>
             <View
@@ -431,7 +435,9 @@ const Checkout = () => {
                 </Text>
               </View>
               <View>
-                <Text style={{ color: 'white', fontSize: 25 }}>$1,249.00</Text>
+                <Text style={{ color: 'white', fontSize: 25 }}>
+                  ${totalAmount}
+                </Text>
               </View>
             </View>
             <View style={{ paddingTop: rh(5) }}>
@@ -466,6 +472,7 @@ const Checkout = () => {
       <ConfirmPurchaseModal
         isVisible={isConfirmationModalVisible}
         setConfirmationModalVisible={setConfirmationModalVisibile}
+        totalAmount={totalAmount}
       />
     </>
   );

@@ -7,11 +7,13 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 type ConfirmPurchaseModalProps = {
   isVisible: boolean;
   setConfirmationModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  totalAmount: number;
 };
 
 const ConfirmPurchaseModal = ({
   isVisible,
   setConfirmationModalVisible,
+  totalAmount,
 }: ConfirmPurchaseModalProps) => {
   const router = useRouter();
   return (
@@ -78,7 +80,9 @@ const ConfirmPurchaseModal = ({
             </View>
             <View style={{ paddingStart: rw(3) }} />
             <View>
-              <Text style={{ color: 'white', fontSize: 20 }}>$1,249.00</Text>
+              <Text style={{ color: 'white', fontSize: 20 }}>
+                ${totalAmount}
+              </Text>
             </View>
           </View>
           <View style={{ paddingTop: rh(2) }}>

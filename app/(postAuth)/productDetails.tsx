@@ -46,6 +46,7 @@ const ProductDetails = () => {
   const isInWishList = wishListItems.some((item) => item.id === data.id);
   const cartItems = useCartStore((state) => state.cartItems);
   const isInCart = cartItems.some((item) => item.id === data.id);
+  const [productItemCount, setProductItemCount] = useState<number>(1);
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const dot1Width = useSharedValue(10);
@@ -68,6 +69,16 @@ const ProductDetails = () => {
     setCurrentPage(e.nativeEvent.position);
   };
 
+  const incrementItemCount = () => {
+    setProductItemCount((prevProductItemCount) => prevProductItemCount + 1);
+  };
+
+  const decrementItemCount = () => {
+    setProductItemCount((prevProductItemCount) =>
+      Math.max(1, prevProductItemCount - 1),
+    );
+  };
+
   useEffect(() => {
     dot1Width.value = withSpring(currentPage === 0 ? 30 : 10);
     dot2Width.value = withSpring(currentPage === 1 ? 30 : 10);
@@ -76,7 +87,10 @@ const ProductDetails = () => {
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingBottom: insets.bottom + rh(3),
+      }}
     >
       <LinearGradient
         colors={['#1e1b4b', '#0B0E14']}
@@ -234,10 +248,42 @@ const ProductDetails = () => {
         <View
           style={{
             flexDirection: 'row',
-            padding: rw(5),
-            justifyContent: 'space-around',
+            paddingTop: rh(2),
+            justifyContent: 'space-evenly',
           }}
         >
+          <Pressable
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: rw(3),
+              backgroundColor: 'grey',
+              borderRadius: 15,
+            }}
+          >
+            <Pressable
+              hitSlop={2}
+              onPress={() => {
+                decrementItemCount();
+              }}
+            >
+              <Text style={{ fontSize: 25, color: 'white' }}>-</Text>
+            </Pressable>
+            <View style={{ paddingStart: rw(3) }}>
+              <Text style={{ fontSize: 20, color: 'white' }}>
+                {productItemCount}
+              </Text>
+            </View>
+            <Pressable
+              hitSlop={2}
+              style={{ paddingStart: rw(3) }}
+              onPress={() => {
+                incrementItemCount();
+              }}
+            >
+              <Text style={{ fontSize: 25, color: 'white' }}>+</Text>
+            </Pressable>
+          </Pressable>
           <Pressable
             onPress={() => {
               if (isInCart) {
@@ -275,7 +321,14 @@ const ProductDetails = () => {
             </View>
           </Pressable>
           <Pressable
-            onPress={() => router.push('/(postAuth)/checkout')}
+            onPress={() =>
+              router.push({
+                pathname: '/(postAuth)/checkout',
+                params: {
+                  cartItemTotal: Number(data.price) * Number(productItemCount),
+                },
+              })
+            }
             style={({ pressed }) => [
               {
                 flexDirection: 'row',
