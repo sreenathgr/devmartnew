@@ -275,6 +275,7 @@ const ProductDetails = () => {
             </View>
           </Pressable>
           <Pressable
+            onPress={() => router.push('/(postAuth)/checkout')}
             style={({ pressed }) => [
               {
                 flexDirection: 'row',

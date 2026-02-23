@@ -109,6 +109,7 @@ const Register = () => {
         uid: user.uid,
         email: user.email,
         fullName: fullName,
+        address: '',
         createdAt: serverTimestamp(),
         profileUrl: null,
         wishlist: [],

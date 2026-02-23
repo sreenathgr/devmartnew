@@ -1,5 +1,6 @@
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -12,6 +13,7 @@ const ConfirmPurchaseModal = ({
   isVisible,
   setConfirmationModalVisible,
 }: ConfirmPurchaseModalProps) => {
+  const router = useRouter();
   return (
     <Modal
       visible={isVisible}
@@ -80,7 +82,11 @@ const ConfirmPurchaseModal = ({
             </View>
           </View>
           <View style={{ paddingTop: rh(2) }}>
-            <View
+            <Pressable
+              onPress={() => {
+                setConfirmationModalVisible(false);
+                router.replace('/(postAuth)/orderConfirm');
+              }}
               style={{
                 backgroundColor: '#3B82F6',
                 height: 58,
@@ -92,7 +98,7 @@ const ConfirmPurchaseModal = ({
               }}
             >
               <Text style={{ color: 'white' }}>CONFIRM & PAY</Text>
-            </View>
+            </Pressable>
           </View>
           <View style={{ paddingTop: rh(2) }}>
             <Pressable
