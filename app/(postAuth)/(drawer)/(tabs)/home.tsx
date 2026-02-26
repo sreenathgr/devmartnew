@@ -34,6 +34,14 @@ type ProductProps = {
   isFavorited: boolean;
 };
 
+type WishlistProductProps = {
+  id: string;
+  productImg: string;
+  productName: string;
+  price: string;
+  isFavorited: boolean;
+};
+
 type UserData = {
   uid: string;
   profileUrl: string;
@@ -41,6 +49,7 @@ type UserData = {
   email: string;
   createdAt: Timestamp;
   curatedItems: ProductProps[];
+  wishlist: WishlistProductProps[];
 };
 
 const ProductRenderItem = ({
@@ -254,6 +263,14 @@ const Home = () => {
 
   useEffect(() => {
     setCuratedProducts(userData?.curatedItems || []);
+  }, [userData]);
+
+  useEffect(() => {
+    if (userData) {
+      userData?.wishlist?.forEach((item) => {
+        addItemToWishList(item);
+      });
+    }
   }, [userData]);
 
   const handleSearch = (text: string) => {

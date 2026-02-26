@@ -9,6 +9,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
 
+import axios from 'axios';
 import {
   ActivityIndicator,
   Pressable,
@@ -19,7 +20,6 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 type ProductProps = {
   id: string;
   productImg: string;
@@ -45,12 +45,44 @@ const Checkout = () => {
   const [isConfirmationModalVisible, setConfirmationModalVisibile] =
     useState<boolean>(false);
   const [selectedMethod, setSelectedMethod] = useState<string>('card');
+  const [confirmModalLoading, setConfirmModalLoading] =
+    useState<boolean>(false);
   const {
     userData,
     userDataLoading,
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
   const totalAmount = Number(cartItemTotal) + 9;
+  const generateOrderId = () => {
+    // Generates a random 4-digit number and attaches it to "100"
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    return `#100${randomSuffix}`;
+  };
+
+  const addOrderDetailsToSpreadSheet = async () => {
+    const url = 'https://hook.eu2.make.com/6w2lkn95w3i6c5vlx65odht9kui7sxg2';
+    const payload = {
+      orderid: generateOrderId(),
+      customerName: userData?.fullName,
+      shippingAddress: userData?.address,
+      paymentMethod: selectedMethod,
+      orderTotal: Number(cartItemTotal) + 9,
+    };
+
+    try {
+      const response = await axios.post(url, payload);
+      if (response.status === 200) {
+        console.log('Success', response.data);
+        setConfirmationModalVisibile(false);
+        router.replace('/(postAuth)/orderConfirm');
+      }
+    } catch (error: any) {
+      console.error('errror sending data', error.message);
+    } finally {
+      setConfirmModalLoading(false);
+    }
+  };
+
   return (
     <>
       <LinearGradient
@@ -471,8 +503,12 @@ const Checkout = () => {
       )}
       <ConfirmPurchaseModal
         isVisible={isConfirmationModalVisible}
-        setConfirmationModalVisible={setConfirmationModalVisibile}
         totalAmount={totalAmount}
+        selectedMethod={selectedMethod}
+        addOrderDetailsToSpreadSheet={addOrderDetailsToSpreadSheet}
+        setConfirmationModalVisibile={setConfirmationModalVisibile}
+        isConfirmButtonLoading={confirmModalLoading}
+        setConfirmButtonLoading={setConfirmModalLoading}
       />
     </>
   );

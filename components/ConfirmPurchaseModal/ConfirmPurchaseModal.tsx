@@ -1,21 +1,35 @@
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 type ConfirmPurchaseModalProps = {
   isVisible: boolean;
-  setConfirmationModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   totalAmount: number;
+  selectedMethod: string;
+  isConfirmButtonLoading: boolean;
+  setConfirmButtonLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setConfirmationModalVisibile: React.Dispatch<React.SetStateAction<boolean>>;
+  addOrderDetailsToSpreadSheet: () => void;
 };
 
 const ConfirmPurchaseModal = ({
   isVisible,
-  setConfirmationModalVisible,
   totalAmount,
+  selectedMethod,
+  addOrderDetailsToSpreadSheet,
+  setConfirmationModalVisibile,
+  isConfirmButtonLoading,
+  setConfirmButtonLoading,
 }: ConfirmPurchaseModalProps) => {
-  const router = useRouter();
   return (
     <Modal
       visible={isVisible}
@@ -26,8 +40,8 @@ const ConfirmPurchaseModal = ({
         <View
           style={{
             backgroundColor: '#20293A',
-            width: rw(80),
-            height: rh(45),
+            width: rw(85),
+            height: rh(50),
             borderRadius: 20,
             alignItems: 'center',
           }}
@@ -75,6 +89,26 @@ const ConfirmPurchaseModal = ({
           >
             <View>
               <Text style={{ color: '#7B8691', fontSize: 20 }}>
+                PAYMENT METHOD
+              </Text>
+            </View>
+            <View style={{ paddingStart: rw(3) }} />
+            <View>
+              <Text style={{ color: 'white', fontSize: 20 }}>
+                {selectedMethod === 'card' ? 'CREDIT CARD' : 'PAYPAL'}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingTop: rh(2),
+            }}
+          >
+            <View>
+              <Text style={{ color: '#7B8691', fontSize: 20 }}>
                 TOTAL AMOUNT
               </Text>
             </View>
@@ -86,27 +120,35 @@ const ConfirmPurchaseModal = ({
             </View>
           </View>
           <View style={{ paddingTop: rh(2) }}>
-            <Pressable
-              onPress={() => {
-                setConfirmationModalVisible(false);
-                router.replace('/(postAuth)/orderConfirm');
-              }}
-              style={{
-                backgroundColor: '#3B82F6',
-                height: 58,
-                borderRadius: 18,
-                justifyContent: 'center',
-                alignItems: 'center',
-
-                paddingHorizontal: rw(10),
-              }}
-            >
-              <Text style={{ color: 'white' }}>CONFIRM & PAY</Text>
-            </Pressable>
+            {isConfirmButtonLoading ? (
+              <View>
+                <ActivityIndicator
+                  size={20}
+                  color={'red'}
+                />
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => {
+                  setConfirmButtonLoading(true);
+                  addOrderDetailsToSpreadSheet();
+                }}
+                style={{
+                  backgroundColor: '#3B82F6',
+                  height: 58,
+                  borderRadius: 18,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: rw(10),
+                }}
+              >
+                <Text style={{ color: 'white' }}>CONFIRM & PAY</Text>
+              </Pressable>
+            )}
           </View>
           <View style={{ paddingTop: rh(2) }}>
             <Pressable
-              onPress={() => setConfirmationModalVisible(false)}
+              onPress={() => setConfirmationModalVisibile(false)}
               style={({ pressed }) => [
                 {
                   backgroundColor: '#262F3F',

@@ -6,7 +6,7 @@ import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -67,7 +67,6 @@ const RenderWishListItem = ({ item }: { item: WishlistProductProps }) => {
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const isInCart = cartItems.some((cartItem) => cartItem.id === item.id);
 
-  const onToggleFavorite = useWishListStore((state) => state.toggleFavorite);
   const removeItemFromWishList = useWishListStore(
     (state) => state.removeItemFromWishList,
   );
@@ -92,7 +91,6 @@ const RenderWishListItem = ({ item }: { item: WishlistProductProps }) => {
         />
         <Pressable
           onPress={() => {
-            //onToggleFavorite(item.id);
             removeItemFromWishList(item.id);
           }}
           style={({ pressed }) => [
@@ -176,17 +174,6 @@ const Wishlist = () => {
   }: { userData: UserData | null; userDataLoading: boolean } =
     useGetCurrentUserData();
   const wishListItems = useWishListStore((state) => state.wishListItems);
-  const addItemToWishList = useWishListStore(
-    (state) => state.addItemToWishList,
-  );
-
-  useEffect(() => {
-    if (userData) {
-      userData?.wishlist?.forEach((item) => {
-        addItemToWishList(item);
-      });
-    }
-  }, [userData]);
 
   return (
     <View style={{ flex: 1 }}>
