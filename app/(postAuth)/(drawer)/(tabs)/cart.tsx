@@ -1,6 +1,7 @@
 import { useCartStore } from '@/hooks/useCart';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Router, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -82,17 +83,55 @@ const CartListFooterComponent = ({
     <View style={{}}>
       {cartListData.length === 0 ? (
         <>
-          <View style={{}}>
-            <Text
+          <View
+            style={{
+              alignItems: 'center',
+              paddingTop: rh(20),
+              justifyContent: 'center',
+            }}
+          >
+            <View
               style={{
-                color: 'white',
-                fontSize: 20,
-                textAlign: 'center',
-                fontFamily: 'Manrope',
+                backgroundColor: 'red',
+                width: 80,
+                height: 80,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 50,
               }}
             >
-              Cart is Empty. Add Items to your Cart
-            </Text>
+              <View>
+                <FontAwesome5
+                  name='shopping-cart'
+                  size={35}
+                  color='white'
+                />
+              </View>
+            </View>
+            <View style={{ paddingTop: rh(2) }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 25,
+                  fontFamily: 'Manrope',
+                  fontWeight: 'bold',
+                }}
+              >
+                your cart is empty
+              </Text>
+            </View>
+            <View style={{ paddingTop: rh(2), paddingHorizontal: rw(5) }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontFamily: 'Manrope',
+                  textAlign: 'center',
+                }}
+              >
+                Looks like you havent added anything yet.
+              </Text>
+            </View>
           </View>
         </>
       ) : (

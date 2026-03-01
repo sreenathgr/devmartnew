@@ -130,10 +130,19 @@ const FlatListHeader = ({
     <View style={{ paddingTop: insets.top, paddingHorizontal: rw(5) }}>
       <View style={styles.headerTopRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <Image
-            source={{ uri: userData?.profileUrl }}
-            style={styles.profileImage}
-          />
+          <>
+            {userData && userData.profileUrl ? (
+              <Image
+                source={{ uri: userData?.profileUrl }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <Image
+                source={require('@/assets/images/dummyprofile.png')}
+                style={styles.profileImage}
+              />
+            )}
+          </>
           <View style={{ paddingStart: rw(4), flex: 1 }}>
             <Text style={{ color: '#7B8691', fontSize: 12 }}>WELCOME BACK</Text>
             <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
@@ -219,10 +228,12 @@ const FlatListHeader = ({
         ))}
       </View>
 
-      <View style={styles.titleSection}>
-        <Text style={styles.sectionTitle}>Curated for you</Text>
-        <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
-      </View>
+      {userData && userData.curatedItems.length > 0 && (
+        <View style={styles.titleSection}>
+          <Text style={styles.sectionTitle}>Curated for you</Text>
+          <Text style={{ color: 'lightblue', fontSize: 14 }}>View all</Text>
+        </View>
+      )}
     </View>
   );
 };

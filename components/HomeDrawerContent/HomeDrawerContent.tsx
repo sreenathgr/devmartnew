@@ -7,6 +7,7 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -14,9 +15,11 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeDrawerButton from '../HomeDrawerButton/HomeDrawerButton';
+
 const HomeDrawerContent = (props: DrawerContentComponentProps) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
   const clearCart = useCartStore((state) => state.clearCart);
   const { userData, userDataLoading } = useGetCurrentUserData();
   const handleLogout = async () => {

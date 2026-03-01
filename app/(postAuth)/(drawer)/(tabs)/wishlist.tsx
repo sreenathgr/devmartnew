@@ -4,6 +4,7 @@ import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import useWishListStore from '@/hooks/useWishlist';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Timestamp } from 'firebase/firestore';
 import React from 'react';
@@ -56,6 +57,60 @@ const WishListHeader = ({ userData }: { userData: UserData | null }) => {
           {wishListItems.length} ITEMS
         </Text>
       </View>
+      <>
+        {wishListItems.length === 0 && (
+          <View
+            style={{
+              alignItems: 'center',
+              height: '100%',
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: 'red',
+                width: 80,
+                height: 80,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 50,
+              }}
+            >
+              <View>
+                <FontAwesome5
+                  name='heart-broken'
+                  size={35}
+                  color='white'
+                />
+              </View>
+            </View>
+            <View style={{ paddingTop: rh(2) }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 25,
+                  fontFamily: 'Manrope',
+                  fontWeight: 'bold',
+                }}
+              >
+                your wishlist is empty
+              </Text>
+            </View>
+            <View style={{ paddingTop: rh(2), paddingHorizontal: rw(5) }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontFamily: 'Manrope',
+                  textAlign: 'center',
+                }}
+              >
+                Start saving items you love to see them here!
+              </Text>
+            </View>
+          </View>
+        )}
+      </>
     </View>
   );
 };

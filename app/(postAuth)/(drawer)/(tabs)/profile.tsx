@@ -128,7 +128,7 @@ const Profile = () => {
                   ) : (
                     <Image
                       source={require('@/assets/images/dummyprofile.png')}
-                      style={{ width: 120, height: 120, borderRadius: 50 }}
+                      style={{ width: 120, height: 120, borderRadius: 80 }}
                       resizeMode='cover'
                     />
                   )}
