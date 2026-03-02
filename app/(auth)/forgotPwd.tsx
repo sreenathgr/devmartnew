@@ -1,16 +1,73 @@
 import { Colors } from '@/constants/Colors';
+import { emailRegex } from '@/utils/regex';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import React, { useState } from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const ForgotPwd = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const auth = getAuth();
+  const [email, setEmail] = useState<string>('');
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
+  const [firebaseResetError, setFirebaseResetError] = useState<boolean>(false);
+  const [firebaseResetErrorMessage, setFirebaseErrorMessage] =
+    useState<string>('');
+
+  const resetPassword = async () => {
+    setFirebaseResetError(false);
+    setFirebaseErrorMessage('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      console.log('check your email for reset password link');
+      ToastAndroid.show(
+        'Password reset email sent! check your mail',
+        ToastAndroid.SHORT,
+      );
+      setTimeout(() => {
+        router.back();
+      }, 2000);
+    } catch (error: any) {
+      console.log(error.message);
+      setFirebaseResetError(true);
+      setFirebaseErrorMessage(error.message);
+    }
+  };
+
+  const validateSubmit = () => {
+    let isValidated = true;
+    setEmailError(false);
+    setEmailErrorMessage('');
+    if (email.trim() === '') {
+      isValidated = false;
+      setEmailError(true);
+      setEmailErrorMessage('please enter email');
+    } else {
+      isValidated = true;
+      setEmailError(false);
+      setEmailErrorMessage('');
+      if (!emailRegex.test(email)) {
+        isValidated = false;
+        setEmailError(true);
+        setEmailErrorMessage('please enter valid email');
+      }
+    }
+    return isValidated;
+  };
   return (
     <LinearGradient
       colors={['#1e1b4b', '#0B0E14']}
@@ -78,12 +135,14 @@ const ForgotPwd = () => {
         </View>
         <View style={{ paddingTop: rh(1) }}>
           <TextInput
+            value={email}
+            onChangeText={(text) => setEmail(text)}
             style={{
               color: 'white',
               borderWidth: 1,
               fontSize: 17,
               height: 50,
-              borderColor: Colors.acccentBlue,
+              borderColor: emailError ? 'red' : Colors.acccentBlue,
               backgroundColor: '#21262E',
               paddingStart: rw(3),
               paddingEnd: rw(15),
@@ -100,8 +159,18 @@ const ForgotPwd = () => {
             />
           </View>
         </View>
+        {emailError && (
+          <View style={{ paddingStart: rw(2) }}>
+            <Text style={{ color: 'red' }}>{emailErrorMessage}</Text>
+          </View>
+        )}
         <View style={{ paddingTop: rh(5) }}>
           <Pressable
+            onPress={() => {
+              if (validateSubmit()) {
+                resetPassword();
+              }
+            }}
             style={({ pressed }) => [
               {
                 opacity: pressed ? 0.5 : 1,
@@ -138,6 +207,11 @@ const ForgotPwd = () => {
             </View>
           </Pressable>
         </View>
+        {firebaseResetError && (
+          <View style={{ alignItems: 'center', paddingTop: rh(2) }}>
+            <Text style={{ color: 'red' }}>{firebaseResetErrorMessage}</Text>
+          </View>
+        )}
       </View>
     </LinearGradient>
   );
