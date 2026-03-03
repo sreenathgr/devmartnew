@@ -123,18 +123,7 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
               }}
             />
           </View>
-          <View
-            style={{
-              paddingHorizontal: rw(5),
-            }}
-          >
-            <HomeDrawerButton
-              iconName='home'
-              titleText='Home'
-              iconColour='#7B8691'
-              IconComponent={Ionicons}
-            />
-          </View>
+
           <View
             style={{
               paddingHorizontal: rw(5),
@@ -148,32 +137,7 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
               IconComponent={Feather}
             />
           </View>
-          <View
-            style={{
-              paddingHorizontal: rw(5),
-            }}
-          >
-            <HomeDrawerButton
-              iconName='heart'
-              titleText='My Wishlist'
-              iconColour='pink'
-              topPadding={rh(2)}
-              IconComponent={Ionicons}
-            />
-          </View>
-          <View
-            style={{
-              paddingHorizontal: rw(5),
-            }}
-          >
-            <HomeDrawerButton
-              iconName='wallet'
-              titleText='Wallet'
-              iconColour='green'
-              topPadding={rh(2)}
-              IconComponent={Ionicons}
-            />
-          </View>
+
           <View
             style={{
               paddingHorizontal: rw(5),
