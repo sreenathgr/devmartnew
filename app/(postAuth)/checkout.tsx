@@ -1,4 +1,5 @@
 import ConfirmPurchaseModal from '@/components/ConfirmPurchaseModal/ConfirmPurchaseModal';
+import { useCartStore } from '@/hooks/useCart';
 import useGetCurrentUserData from '@/hooks/useGetCurrentUserData';
 import { rh, rw } from '@/utils/responsiveScreenMeasures';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -41,6 +42,7 @@ type UserData = {
 const Checkout = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const clearCart = useCartStore((state) => state.clearCart);
   const { cartItemTotal } = useLocalSearchParams();
   const [isConfirmationModalVisible, setConfirmationModalVisibile] =
     useState<boolean>(false);
@@ -72,6 +74,7 @@ const Checkout = () => {
     try {
       const response = await axios.post(url, payload);
       if (response.status === 200) {
+        clearCart();
         console.log('Success', response.data);
         setConfirmationModalVisibile(false);
         router.replace('/(postAuth)/orderConfirm');

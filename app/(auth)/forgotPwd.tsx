@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -21,6 +22,8 @@ const ForgotPwd = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const auth = getAuth();
+  const [isResetLinkButtonLoading, setResetLinkButtonLoading] =
+    useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [emailError, setEmailError] = useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState<string>('');
@@ -45,6 +48,8 @@ const ForgotPwd = () => {
       console.log(error.message);
       setFirebaseResetError(true);
       setFirebaseErrorMessage(error.message);
+    } finally {
+      setResetLinkButtonLoading(false);
     }
   };
 
@@ -165,47 +170,57 @@ const ForgotPwd = () => {
           </View>
         )}
         <View style={{ paddingTop: rh(5) }}>
-          <Pressable
-            onPress={() => {
-              if (validateSubmit()) {
-                resetPassword();
-              }
-            }}
-            style={({ pressed }) => [
-              {
-                opacity: pressed ? 0.5 : 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#9F7AEA',
-                height: 58,
-                borderRadius: 20,
-                elevation: 20,
-                shadowColor: '#9F7AEA',
-                shadowOffset: { width: 20, height: 20 },
-              },
-            ]}
-          >
+          {!isResetLinkButtonLoading ? (
+            <Pressable
+              onPress={() => {
+                if (validateSubmit()) {
+                  setResetLinkButtonLoading(true);
+                  resetPassword();
+                }
+              }}
+              style={({ pressed }) => [
+                {
+                  opacity: pressed ? 0.5 : 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#9F7AEA',
+                  height: 58,
+                  borderRadius: 20,
+                  elevation: 20,
+                  shadowColor: '#9F7AEA',
+                  shadowOffset: { width: 20, height: 20 },
+                },
+              ]}
+            >
+              <View>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontFamily: 'Manrope',
+                    fontWeight: 'bold',
+                    fontSize: 20,
+                  }}
+                >
+                  Send Reset Link
+                </Text>
+              </View>
+              <View style={{ paddingStart: rw(3) }}>
+                <MaterialCommunityIcons
+                  name='play'
+                  size={24}
+                  color='white'
+                />
+              </View>
+            </Pressable>
+          ) : (
             <View>
-              <Text
-                style={{
-                  color: 'white',
-                  fontFamily: 'Manrope',
-                  fontWeight: 'bold',
-                  fontSize: 20,
-                }}
-              >
-                Send Reset Link
-              </Text>
-            </View>
-            <View style={{ paddingStart: rw(3) }}>
-              <MaterialCommunityIcons
-                name='play'
-                size={24}
-                color='white'
+              <ActivityIndicator
+                size={30}
+                color={'red'}
               />
             </View>
-          </Pressable>
+          )}
         </View>
         {firebaseResetError && (
           <View style={{ alignItems: 'center', paddingTop: rh(2) }}>

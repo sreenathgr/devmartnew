@@ -33,11 +33,14 @@ const Register = () => {
   const [toggleVisiblePassword, setToggleVisiblePassword] =
     useState<boolean>(true);
   const [fullName, setFullName] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [reEnterPassword, setReEnterPassword] = useState<string>('');
   const [fullNameError, setFullNameError] = useState<boolean>(false);
   const [fullNameErrorMessage, setFullNameErrorMessage] = useState<string>('');
+  const [addressError, setAddressError] = useState<boolean>(false);
+  const [addressErrorMessage, setAddressErrorMessage] = useState<string>('');
   const [emailAddressError, setEmailAddressError] = useState<boolean>(false);
   const [emailAddressErrorMessage, setEmailAddressErrorMessage] =
     useState<string>('');
@@ -53,6 +56,8 @@ const Register = () => {
 
     setFullNameError(false);
     setFullNameErrorMessage('');
+    setAddressError(false);
+    setAddressErrorMessage('');
     setEmailAddressError(false);
     setEmailAddressErrorMessage('');
     setPasswordError(false);
@@ -63,6 +68,12 @@ const Register = () => {
     if (fullName.trim().length === 0) {
       setFullNameError(true);
       setFullNameErrorMessage('Full name should not be empty');
+      isValidated = false;
+    }
+
+    if (address.trim().length === 0) {
+      setAddressError(true);
+      setAddressErrorMessage('Address should not be empty');
       isValidated = false;
     }
 
@@ -109,7 +120,7 @@ const Register = () => {
         uid: user.uid,
         email: user.email,
         fullName: fullName,
-        address: '',
+        address: address,
         createdAt: serverTimestamp(),
         profileUrl: null,
         wishlist: [],
@@ -208,9 +219,50 @@ const Register = () => {
                 <Text
                   style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
                 >
+                  ADDRESS
+                </Text>
+              </View>
+
+              <View style={{ paddingTop: rh(2) }}>
+                <TextInput
+                  style={{
+                    color: 'white',
+                    borderWidth: 1,
+                    fontSize: 17,
+                    height: 70,
+                    borderColor: addressError ? 'red' : Colors.acccentBlue,
+                    backgroundColor: '#21262E',
+                    paddingStart: rw(11),
+                    borderRadius: 20,
+                  }}
+                  value={address}
+                  onChangeText={(text) => setAddress(text)}
+                  placeholder='123 Luxury Lane, Beverly Hills'
+                  placeholderTextColor={'#7B8691'}
+                />
+                <View
+                  style={{ position: 'absolute', bottom: '32%', left: '5%' }}
+                >
+                  <Ionicons
+                    name='location'
+                    size={24}
+                    color='#7B8691'
+                  />
+                </View>
+              </View>
+              {addressError && (
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ color: 'red' }}>{addressErrorMessage}</Text>
+                </View>
+              )}
+              <View style={{ paddingTop: rh(3) }}>
+                <Text
+                  style={{ color: '#7B8691', fontSize: 16, fontWeight: 'bold' }}
+                >
                   EMAIL ADDRESS
                 </Text>
               </View>
+
               <View style={{ paddingTop: rh(2) }}>
                 <TextInput
                   style={{
