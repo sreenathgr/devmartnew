@@ -36,7 +36,9 @@ const HomeDrawerContent = (props: DrawerContentComponentProps) => {
         console.log('Listener detected logout, redirecting...');
         clearCart();
         props.navigation.closeDrawer();
-        router.replace('/(auth)/login');
+        setTimeout(() => {
+          router.replace('/(auth)/login');
+        }, 100);
       }
     });
 

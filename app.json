@@ -4,33 +4,32 @@
     "slug": "devmartnew",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/splashlogo.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "devmartnew",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sreenath12.devmartnew"
     },
     "android": {
+      "package": "com.sreenath12.devmartnew",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/splashlogo.png",
-        "backgroundImage": "./assets/images/splashlogo.png",
-        "monochromeImage": "./assets/images/splashlogo.png"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#E6F4FE"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/splashlogo.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splashlogo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -43,7 +42,13 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f023b962-6dc4-4b51-86fe-ddd6cd447612"
+      }
     }
   }
 }
