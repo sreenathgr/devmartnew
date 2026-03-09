@@ -75,8 +75,11 @@ const ConfirmPurchaseModal = ({
             </Text>
           </View>
           <View style={{ paddingTop: rh(1) }}>
-            <Text style={{ color: '#7B8691', fontSize: 15 }}>
-              Please review your final total
+            <Text
+              style={{ color: 'yellow', fontSize: 15, textAlign: 'center' }}
+            >
+              Please note for tracking purpose, the order details are stored in
+              our servers
             </Text>
           </View>
           <View
